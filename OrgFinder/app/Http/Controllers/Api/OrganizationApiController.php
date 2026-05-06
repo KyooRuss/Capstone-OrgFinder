@@ -10,6 +10,7 @@ class OrganizationApiController extends Controller
 {
     public function index(Request $request)
     {
+        $user  = $request->user();
         $query = Organization::with(['photos', 'reasons', 'testimonials'])
             ->whereNull('deleted_at');
 
@@ -21,7 +22,10 @@ class OrganizationApiController extends Controller
             $query->where('category', $category);
         }
 
-        $orgs = $query->orderBy('name')->get();
+        $orgs = $query->orderBy('name')->get()->filter(function ($org) use ($user) {
+            $eligible = $org->eligible_programs;
+            return empty($eligible) || in_array($user->program, $eligible);
+        })->values();
 
         return response()->json(['organizations' => $orgs->map(fn($o) => $this->orgResource($o))]);
     }

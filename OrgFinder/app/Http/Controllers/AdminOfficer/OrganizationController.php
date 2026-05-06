@@ -90,9 +90,14 @@ class OrganizationController extends Controller
 
         // Replace testimonials
         $organization->testimonials()->delete();
+        $authors = $request->input('testimonial_authors', []);
         foreach (($validated['testimonials'] ?? []) as $index => $testimonial) {
             if (!empty(trim($testimonial))) {
-                $organization->testimonials()->create(['testimonial' => $testimonial, 'order_index' => $index]);
+                $organization->testimonials()->create([
+                    'testimonial' => $testimonial,
+                    'author'      => $authors[$index] ?? null,
+                    'order_index' => $index,
+                ]);
             }
         }
 

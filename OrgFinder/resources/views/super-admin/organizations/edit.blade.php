@@ -176,16 +176,29 @@
                 </div>
             </div>
 
+            <div class="card" style="margin-bottom:20px;">
+                <p class="section-title">Program Eligibility</p>
+                <p style="font-size:12px;color:#94a3b8;margin-bottom:12px;">Select which programs can join this org. Leave empty to allow all programs.</p>
+                @php $programs = ['BSIT','BSCS','BSIS','BSCpE','BSCE','BSEE','BSME','BSN','BSBA','BSA']; @endphp
+                @include('super-admin.partials.program-select', [
+                    'programs'        => $programs,
+                    'selectedPrograms'=> old('eligible_programs', $organization->eligible_programs ?? []),
+                    'inputId'         => 'programSelect',
+                ])
+            </div>
+
             <div class="card">
                 <p class="section-title">Member / Alumni Testimonials</p>
                 <div id="testimonialsList">
                     @forelse($organization->testimonials as $testimonial)
                     <div class="testimonial-wrap">
+                        <input type="text" name="testimonial_authors[]" class="form-control" placeholder="Author name (e.g. Juan dela Cruz, Alumni)" value="{{ old('testimonial_authors.'.$loop->index, $testimonial->author) }}" style="margin-bottom:6px;">
                         <textarea name="testimonials[]" class="form-control" rows="3">{{ old('testimonials.'.$loop->index, $testimonial->testimonial) }}</textarea>
                         <button type="button" class="remove-btn" onclick="removeItem(this)" title="Remove">×</button>
                     </div>
                     @empty
                     <div class="testimonial-wrap">
+                        <input type="text" name="testimonial_authors[]" class="form-control" placeholder="Author name (e.g. Juan dela Cruz, Alumni)" style="margin-bottom:6px;">
                         <textarea name="testimonials[]" class="form-control" rows="3" placeholder="Enter a testimonial"></textarea>
                         <button type="button" class="remove-btn" onclick="removeItem(this)" title="Remove">×</button>
                     </div>
@@ -274,7 +287,9 @@ function addTestimonial() {
     const list = document.getElementById('testimonialsList');
     const div = document.createElement('div');
     div.className = 'testimonial-wrap';
-    div.innerHTML = `<textarea name="testimonials[]" class="form-control" rows="3" placeholder="Enter a testimonial"></textarea>
+    div.innerHTML = `
+        <input type="text" name="testimonial_authors[]" class="form-control" placeholder="Author name (e.g. Juan dela Cruz, Alumni)" style="margin-bottom:6px;">
+        <textarea name="testimonials[]" class="form-control" rows="3" placeholder="Enter a testimonial"></textarea>
         <button type="button" class="remove-btn" onclick="removeItem(this)" title="Remove">×</button>`;
     list.appendChild(div);
 }

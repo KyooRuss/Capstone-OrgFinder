@@ -89,7 +89,10 @@
                 @foreach($testimonials as $t)
                 <div style="background:#f8f9ff;border-radius:10px;padding:14px 16px;">
                     <svg width="20" height="20" viewBox="0 0 24 24" fill="#4361EE" style="margin-bottom:8px;opacity:.5;"><path d="M6 17h3l2-4V7H5v6h3zm8 0h3l2-4V7h-6v6h3z"/></svg>
-                    <p style="font-size:12px;color:#475569;line-height:1.6;margin:0;">{{ $t->testimonial }}</p>
+                    <p style="font-size:12px;color:#475569;line-height:1.6;margin:0 0 8px;">{{ $t->testimonial }}</p>
+                    @if($t->author)
+                    <div style="font-size:11px;font-weight:700;color:#4361EE;">— {{ $t->author }}</div>
+                    @endif
                 </div>
                 @endforeach
             </div>
@@ -146,8 +149,7 @@
 
         {{-- Photos Coverflow Carousel --}}
         @if($photos->count())
-        <div class="card" style="overflow:hidden;">
-            <div style="font-size:13px;font-weight:800;color:#1e2f6e;text-transform:uppercase;letter-spacing:.5px;margin-bottom:14px;">Photos</div>
+        <div class="card" style="overflow:hidden;padding-top:16px;">
             <div style="position:relative;height:220px;">
                 @foreach($photos as $i => $photo)
                 <div class="cf-slide" data-index="{{ $i }}"
@@ -238,7 +240,12 @@ document.addEventListener('keydown', e => {
     if (e.key === 'Escape')     closeLightbox();
 });
 
-if (cfTotal > 0) cfRender();
+if (cfTotal > 0) {
+    cfRender();
+    if (cfTotal > 1) {
+        setInterval(() => cfGoTo((cfCurrent + 1) % cfTotal), 2000);
+    }
+}
 
 // ── Lightbox ────────────────────────────────────────────────────────
 function openLightbox(src, caption) {

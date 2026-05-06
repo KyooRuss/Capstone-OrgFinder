@@ -110,7 +110,7 @@
 {{-- Create Event Modal --}}
 <div class="modal-overlay" id="createEventModal">
     <div class="modal modal-wide">
-        <button class="modal-close" onclick="closeModal('createEventModal')">×</button>
+        <button class="modal-close" onclick="closeModal('createEventModal'); selectedImageFile = null;">×</button>
         <div style="display:flex;gap:24px;">
             <div class="event-image-box upload-box" id="uploadBox" onclick="document.getElementById('eventImageInput').click()">
                 <svg width="40" height="40" viewBox="0 0 24 24" fill="#aaa"><path d="M21 19V5c0-1.1-.9-2-2-2H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2zM8.5 13.5l2.5 3.01L14.5 12l4.5 6H5l3.5-4.5z"/></svg>
@@ -155,6 +155,7 @@
 @push('scripts')
 <script>
 const statusColors = { pending: '#e96500', approved: '#0f9800', rejected: '#eb3223' };
+let selectedImageFile = null;
 
 function viewEvent(id) {
     fetch(`/admin-officer/events/${id}`, { headers: { 'Accept': 'application/json' } })
@@ -189,8 +190,7 @@ document.getElementById('createEventForm').addEventListener('submit', function(e
     const errEl = document.getElementById('createEventError');
     errEl.style.display = 'none';
     const formData = new FormData(this);
-    const imgInput = document.getElementById('eventImageInput');
-    if (imgInput && imgInput.files[0]) formData.append('image', imgInput.files[0]);
+    if (selectedImageFile) formData.append('image', selectedImageFile);
 
     fetch('/admin-officer/events', {
         method: 'POST',
@@ -211,6 +211,7 @@ document.getElementById('createEventForm').addEventListener('submit', function(e
 
 function previewImage(input) {
     if (input.files && input.files[0]) {
+        selectedImageFile = input.files[0];
         const reader = new FileReader();
         reader.onload = e => {
             document.getElementById('uploadBox').innerHTML =

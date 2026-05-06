@@ -60,6 +60,7 @@ Route::prefix('super-admin')->name('super-admin.')->group(function () {
         // Students
         Route::prefix('students')->name('students.')->group(function () {
             Route::get('/', [StudentController::class, 'index'])->name('index');
+            Route::get('/search', [StudentController::class, 'search'])->name('search');
             Route::post('/{user}/make-admin', [StudentController::class, 'makeAdmin'])->name('make-admin');
             Route::post('/{user}/block', [StudentController::class, 'block'])->name('block');
             Route::post('/{user}/unblock', [StudentController::class, 'unblock'])->name('unblock');

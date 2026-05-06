@@ -130,11 +130,13 @@
                 <div id="testimonialsList">
                     @forelse($organization->testimonials as $testimonial)
                     <div class="removable-item">
+                        <input type="text" name="testimonial_authors[]" class="form-control" placeholder="Author name (e.g. Juan dela Cruz, Alumni)" value="{{ old('testimonial_authors.'.$loop->index, $testimonial->author) }}" style="margin-bottom:6px;">
                         <textarea name="testimonials[]" class="form-control" rows="3" placeholder="Enter testimonial">{{ old('testimonials.'.$loop->index, $testimonial->testimonial) }}</textarea>
                         <button type="button" class="remove-btn" onclick="this.closest('.removable-item').remove()">×</button>
                     </div>
                     @empty
                     <div class="removable-item">
+                        <input type="text" name="testimonial_authors[]" class="form-control" placeholder="Author name (e.g. Juan dela Cruz, Alumni)" style="margin-bottom:6px;">
                         <textarea name="testimonials[]" class="form-control" rows="3" placeholder="Enter testimonial 1"></textarea>
                         <button type="button" class="remove-btn" onclick="this.closest('.removable-item').remove()">×</button>
                     </div>
@@ -199,7 +201,9 @@ function addTestimonial() {
     const list = document.getElementById('testimonialsList');
     const div = document.createElement('div');
     div.className = 'removable-item';
-    div.innerHTML = `<textarea name="testimonials[]" class="form-control" rows="3" placeholder="Enter testimonial"></textarea>
+    div.innerHTML = `
+        <input type="text" name="testimonial_authors[]" class="form-control" placeholder="Author name (e.g. Juan dela Cruz, Alumni)" style="margin-bottom:6px;">
+        <textarea name="testimonials[]" class="form-control" rows="3" placeholder="Enter testimonial"></textarea>
         <button type="button" class="remove-btn" onclick="this.closest('.removable-item').remove()">×</button>`;
     list.appendChild(div);
 }

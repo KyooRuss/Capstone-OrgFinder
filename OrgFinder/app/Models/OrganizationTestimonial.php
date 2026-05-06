@@ -6,7 +6,7 @@ use Illuminate\Database\Eloquent\Model;
 
 class OrganizationTestimonial extends Model
 {
-    protected $fillable = ['organization_id', 'testimonial', 'order_index'];
+    protected $fillable = ['organization_id', 'testimonial', 'author', 'order_index'];
 
     public function organization()
     {

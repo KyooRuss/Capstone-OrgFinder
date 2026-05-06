@@ -32,19 +32,21 @@ class OrganizationController extends Controller
     public function store(Request $request)
     {
         $validated = $request->validate([
-            'name'             => ['required', 'string', 'max:255'],
-            'vision'           => ['nullable', 'string'],
-            'mission'          => ['nullable', 'string'],
-            'room_number'      => ['nullable', 'string', 'max:100'],
-            'contact_telegram' => ['nullable', 'string', 'max:255'],
-            'contact_facebook' => ['nullable', 'string', 'max:255'],
-            'logo'             => ['nullable', 'image', 'max:2048'],
-            'photos'           => ['nullable', 'array'],
-            'photos.*'         => ['image', 'max:2048'],
-            'reasons'          => ['nullable', 'array'],
-            'reasons.*'        => ['nullable', 'string'],
-            'testimonials'     => ['nullable', 'array'],
-            'testimonials.*'   => ['nullable', 'string'],
+            'name'              => ['required', 'string', 'max:255'],
+            'vision'            => ['nullable', 'string'],
+            'mission'           => ['nullable', 'string'],
+            'room_number'       => ['nullable', 'string', 'max:100'],
+            'contact_telegram'  => ['nullable', 'string', 'max:255'],
+            'contact_facebook'  => ['nullable', 'string', 'max:255'],
+            'logo'              => ['nullable', 'image', 'max:2048'],
+            'photos'            => ['nullable', 'array'],
+            'photos.*'          => ['image', 'max:2048'],
+            'reasons'           => ['nullable', 'array'],
+            'reasons.*'         => ['nullable', 'string'],
+            'testimonials'      => ['nullable', 'array'],
+            'testimonials.*'    => ['nullable', 'string'],
+            'eligible_programs' => ['nullable', 'array'],
+            'eligible_programs.*' => ['string'],
         ]);
 
         $logoPath = null;
@@ -53,13 +55,14 @@ class OrganizationController extends Controller
         }
 
         $organization = Organization::create([
-            'name'             => $validated['name'],
-            'vision'           => $validated['vision'] ?? null,
-            'mission'          => $validated['mission'] ?? null,
-            'room_number'      => $validated['room_number'] ?? null,
-            'contact_telegram' => $validated['contact_telegram'] ?? null,
-            'contact_facebook' => $validated['contact_facebook'] ?? null,
-            'logo'             => $logoPath,
+            'name'              => $validated['name'],
+            'vision'            => $validated['vision'] ?? null,
+            'mission'           => $validated['mission'] ?? null,
+            'room_number'       => $validated['room_number'] ?? null,
+            'contact_telegram'  => $validated['contact_telegram'] ?? null,
+            'contact_facebook'  => $validated['contact_facebook'] ?? null,
+            'logo'              => $logoPath,
+            'eligible_programs' => $validated['eligible_programs'] ?? null,
         ]);
 
         if ($request->hasFile('photos')) {
@@ -75,9 +78,14 @@ class OrganizationController extends Controller
             }
         }
 
+        $authors = $request->input('testimonial_authors', []);
         foreach (($validated['testimonials'] ?? []) as $index => $testimonial) {
             if (!empty($testimonial)) {
-                $organization->testimonials()->create(['testimonial' => $testimonial, 'order_index' => $index]);
+                $organization->testimonials()->create([
+                    'testimonial' => $testimonial,
+                    'author'      => $authors[$index] ?? null,
+                    'order_index' => $index,
+                ]);
             }
         }
 
@@ -95,19 +103,21 @@ class OrganizationController extends Controller
     public function update(Request $request, Organization $organization)
     {
         $validated = $request->validate([
-            'name'             => ['required', 'string', 'max:255'],
-            'vision'           => ['nullable', 'string'],
+            'name'              => ['required', 'string', 'max:255'],
+            'vision'            => ['nullable', 'string'],
             'mission'          => ['nullable', 'string'],
-            'room_number'      => ['nullable', 'string', 'max:100'],
-            'contact_telegram' => ['nullable', 'string', 'max:255'],
-            'contact_facebook' => ['nullable', 'string', 'max:255'],
-            'logo'             => ['nullable', 'image', 'max:2048'],
-            'photos'           => ['nullable', 'array'],
-            'photos.*'         => ['image', 'max:2048'],
-            'reasons'          => ['nullable', 'array'],
-            'reasons.*'        => ['nullable', 'string'],
-            'testimonials'     => ['nullable', 'array'],
-            'testimonials.*'   => ['nullable', 'string'],
+            'room_number'       => ['nullable', 'string', 'max:100'],
+            'contact_telegram'  => ['nullable', 'string', 'max:255'],
+            'contact_facebook'  => ['nullable', 'string', 'max:255'],
+            'logo'              => ['nullable', 'image', 'max:2048'],
+            'photos'            => ['nullable', 'array'],
+            'photos.*'          => ['image', 'max:2048'],
+            'reasons'           => ['nullable', 'array'],
+            'reasons.*'         => ['nullable', 'string'],
+            'testimonials'      => ['nullable', 'array'],
+            'testimonials.*'    => ['nullable', 'string'],
+            'eligible_programs' => ['nullable', 'array'],
+            'eligible_programs.*' => ['string'],
         ]);
 
         $logoPath = $organization->logo;
@@ -117,13 +127,14 @@ class OrganizationController extends Controller
         }
 
         $organization->update([
-            'name'             => $validated['name'],
-            'vision'           => $validated['vision'] ?? null,
-            'mission'          => $validated['mission'] ?? null,
-            'room_number'      => $validated['room_number'] ?? null,
-            'contact_telegram' => $validated['contact_telegram'] ?? null,
-            'contact_facebook' => $validated['contact_facebook'] ?? null,
-            'logo'             => $logoPath,
+            'name'              => $validated['name'],
+            'vision'            => $validated['vision'] ?? null,
+            'mission'           => $validated['mission'] ?? null,
+            'room_number'       => $validated['room_number'] ?? null,
+            'contact_telegram'  => $validated['contact_telegram'] ?? null,
+            'contact_facebook'  => $validated['contact_facebook'] ?? null,
+            'logo'              => $logoPath,
+            'eligible_programs' => $validated['eligible_programs'] ?? null,
         ]);
 
         // Replace reasons
@@ -136,9 +147,14 @@ class OrganizationController extends Controller
 
         // Replace testimonials
         $organization->testimonials()->delete();
+        $authors = $request->input('testimonial_authors', []);
         foreach (($validated['testimonials'] ?? []) as $index => $testimonial) {
             if (!empty($testimonial)) {
-                $organization->testimonials()->create(['testimonial' => $testimonial, 'order_index' => $index]);
+                $organization->testimonials()->create([
+                    'testimonial' => $testimonial,
+                    'author'      => $authors[$index] ?? null,
+                    'order_index' => $index,
+                ]);
             }
         }
 

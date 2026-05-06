@@ -52,9 +52,6 @@
                     </td>
                     <td style="text-align:center;">
                         <div style="display:flex;gap:6px;justify-content:center;align-items:center;">
-                            <button class="btn btn-primary btn-sm" onclick="confirmMakeAdmin({{ $student['id'] }}, '{{ addslashes($student['name']) }}')">
-                                Make Admin
-                            </button>
                             @if($student['status'] === 'active')
                                 <button class="icon-btn" title="Block" onclick="confirmBlock({{ $student['id'] }}, '{{ addslashes($student['name']) }}')">
                                     <svg viewBox="0 0 24 24" fill="#94a3b8" width="20" height="20"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm5 11H7v-2h10v2z"/></svg>
@@ -77,20 +74,6 @@
                 @endforelse
             </tbody>
         </table>
-    </div>
-</div>
-
-{{-- Make Admin Confirm --}}
-<div class="modal-overlay" id="makeAdminModal">
-    <div class="modal" style="max-width:380px;text-align:center;">
-        <div class="modal-title" style="color:#1e3a5c;">Make an Admin</div>
-        <div class="modal-body">
-            Are you sure you want to make this student <strong id="makeAdminName"></strong> a super admin?
-        </div>
-        <div class="modal-actions">
-            <button class="btn btn-outline" onclick="closeModal('makeAdminModal')">Cancel</button>
-            <button class="btn btn-primary" id="confirmMakeAdminBtn">Confirm</button>
-        </div>
     </div>
 </div>
 
@@ -121,19 +104,7 @@
 
 @push('scripts')
 <script>
-let makeAdminId = null, blockId = null, deleteId = null;
-
-function confirmMakeAdmin(id, name) {
-    makeAdminId = id;
-    document.getElementById('makeAdminName').textContent = `"${name}"`;
-    openModal('makeAdminModal');
-}
-document.getElementById('confirmMakeAdminBtn').addEventListener('click', function() {
-    fetch(`/super-admin/students/${makeAdminId}/make-admin`, {
-        method: 'POST',
-        headers: { 'X-CSRF-TOKEN': csrfToken(), 'Accept': 'application/json' }
-    }).then(() => location.reload());
-});
+let blockId = null, deleteId = null;
 
 function confirmBlock(id, name) {
     blockId = id;

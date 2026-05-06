@@ -57,10 +57,6 @@
                         </span>
                     </td>
                     <td style="text-align:center;white-space:nowrap;">
-                        <button class="btn btn-dark btn-sm-pill" style="margin-right:4px;"
-                            onclick="confirmMakeOfficer({{ $member->id }}, '{{ addslashes($member->name) }}')">
-                            Make Officer
-                        </button>
                         @if(($member->status ?? 'active') === 'active')
                         <button class="icon-btn" title="Block"
                             onclick="confirmBlock({{ $member->id }}, '{{ addslashes($member->name) }}')">
@@ -117,22 +113,6 @@
     </div>
 </div>
 
-{{-- Make Officer Confirm --}}
-<div class="modal-overlay" id="makeOfficerModal">
-    <div class="modal" style="max-width:400px;text-align:center;">
-        <button class="modal-close" onclick="closeModal('makeOfficerModal')">×</button>
-        <div class="modal-title" style="text-align:center;">Make an Admin</div>
-        <div class="modal-body">
-            Are you sure you want to make this student<br>
-            "<strong id="makeOfficerName"></strong>" an admin officer?
-        </div>
-        <div class="modal-actions">
-            <button class="btn btn-outline" onclick="closeModal('makeOfficerModal')">Cancel</button>
-            <button class="btn btn-success" id="confirmMakeOfficerBtn">Confirm</button>
-        </div>
-    </div>
-</div>
-
 {{-- Block Member Confirm --}}
 <div class="modal-overlay" id="blockMemberModal">
     <div class="modal" style="max-width:380px;text-align:center;">
@@ -172,11 +152,6 @@
 <script>
 let currentMemberId = null;
 
-function confirmMakeOfficer(id, name) {
-    currentMemberId = id;
-    document.getElementById('makeOfficerName').textContent = name;
-    openModal('makeOfficerModal');
-}
 function confirmBlock(id, name) {
     currentMemberId = id;
     document.getElementById('blockMemberName').textContent = name;
@@ -188,11 +163,6 @@ function confirmRemove(id, name) {
     openModal('removeMemberModal');
 }
 
-document.getElementById('confirmMakeOfficerBtn').addEventListener('click', function() {
-    fetch(`/admin-officer/members/${currentMemberId}/make-officer`, {
-        method: 'POST', headers: { 'X-CSRF-TOKEN': csrfToken(), 'Accept': 'application/json' }
-    }).then(() => location.reload());
-});
 document.getElementById('confirmBlockBtn').addEventListener('click', function() {
     fetch(`/admin-officer/members/${currentMemberId}/block`, {
         method: 'POST', headers: { 'X-CSRF-TOKEN': csrfToken(), 'Accept': 'application/json' }

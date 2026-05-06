@@ -34,6 +34,36 @@ class StudentController extends Controller
         return view('super-admin.students.index', compact('students'));
     }
 
+    public function search(Request $request)
+    {
+        $q = $request->input('q', '');
+        $excludeOrgId = $request->input('org_id');
+
+        $query = User::where('role', 'student')
+            ->where('status', 'active')
+            ->where(function ($query) use ($q) {
+                $query->where('name', 'like', "%{$q}%")
+                      ->orWhere('email', 'like', "%{$q}%")
+                      ->orWhere('student_number', 'like', "%{$q}%");
+            });
+
+        if ($excludeOrgId) {
+            $query->whereDoesntHave('organizationAccess', function ($q) use ($excludeOrgId) {
+                $q->where('organization_id', $excludeOrgId);
+            });
+        }
+
+        $students = $query->limit(8)->get()->map(fn($u) => [
+            'id'             => $u->id,
+            'name'           => $u->name,
+            'email'          => $u->email,
+            'student_number' => $u->student_number ?? '—',
+            'year_level'     => $u->year_level ?? '—',
+        ]);
+
+        return response()->json($students);
+    }
+
     public function makeAdmin(User $user)
     {
         $user->update(['role' => 'admin_officer']);

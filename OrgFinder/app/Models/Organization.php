@@ -13,6 +13,11 @@ class Organization extends Model
     protected $fillable = [
         'name', 'category', 'president', 'vision', 'mission',
         'room_number', 'contact_telegram', 'contact_facebook', 'logo',
+        'eligible_programs',
+    ];
+
+    protected $casts = [
+        'eligible_programs' => 'array',
     ];
 
     public function photos()

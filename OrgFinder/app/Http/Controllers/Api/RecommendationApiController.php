@@ -58,7 +58,11 @@ class RecommendationApiController extends Controller
 
         $orgs = Organization::with(['photos'])
             ->whereNull('deleted_at')
-            ->get();
+            ->get()
+            ->filter(function ($org) use ($user) {
+                $eligible = $org->eligible_programs;
+                return empty($eligible) || in_array($user->program, $eligible);
+            });
 
         $scored = $orgs->map(function ($org) use ($user) {
             [$score, $matchedTags] = $this->scoreOrg($org, $user);

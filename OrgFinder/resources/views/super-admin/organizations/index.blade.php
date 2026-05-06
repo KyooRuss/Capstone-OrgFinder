@@ -66,43 +66,69 @@
         <button class="modal-close" onclick="closeModal('accessModal')">×</button>
         <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:16px;">
             <div class="modal-title" id="accessModalTitle" style="margin-bottom:0;"></div>
-            <button class="btn btn-primary btn-sm" onclick="openModal('grantModal')">+ Add User</button>
+            <button class="btn btn-primary btn-sm" onclick="resetGrantModal(); openModal('grantModal')">+ Add User</button>
         </div>
         <p style="font-size:12px;color:#94a3b8;margin-bottom:14px;">User with access</p>
         <ul class="access-list" id="accessList"></ul>
     </div>
 </div>
 
-{{-- Grant Access Modal --}}
+{{-- Grant Access Modal (Two-Step) --}}
 <div class="modal-overlay" id="grantModal">
-    <div class="modal" style="max-width:420px;">
-        <button class="modal-close" onclick="closeModal('grantModal')">×</button>
-        <div class="modal-title" style="text-align:center;">Grant Access</div>
-        <form id="grantForm">
-            <div class="form-group">
-                <div style="display:flex;align-items:center;gap:10px;border:1px solid #e2e8f0;border-radius:8px;padding:10px 14px;background:#f8fafc;">
-                    <svg width="16" height="16" viewBox="0 0 24 24" fill="#94a3b8"><path d="M20 4H4c-1.1 0-2 .9-2 2v12c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V6c0-1.1-.9-2-2-2zm0 4l-8 5-8-5V6l8 5 8-5v2z"/></svg>
-                    <input type="email" id="grantEmail" class="form-control" placeholder="Enter user email address" style="border:none;background:transparent;padding:0;" required>
+    <div class="modal" style="max-width:460px;">
+        <button class="modal-close" onclick="closeGrantModal()">×</button>
+
+        {{-- Step 1: Search Student --}}
+        <div id="grantStep1">
+            <div class="modal-title" style="text-align:center;margin-bottom:4px;">Select Student</div>
+            <p style="text-align:center;font-size:12px;color:#94a3b8;margin-bottom:16px;">Search by name, email, or student number</p>
+            <div style="position:relative;">
+                <div style="display:flex;align-items:center;gap:10px;border:1.5px solid #e2e8f0;border-radius:8px;padding:10px 14px;background:#f8fafc;">
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#94a3b8" stroke-width="2"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg>
+                    <input type="text" id="studentSearchInput" placeholder="Search student..." style="border:none;background:transparent;padding:0;outline:none;width:100%;font-size:14px;" oninput="searchStudents(this.value)">
+                </div>
+                <div id="studentSearchResults" style="margin-top:8px;max-height:260px;overflow-y:auto;display:none;border:1px solid #e2e8f0;border-radius:8px;background:#fff;box-shadow:0 4px 12px rgba(0,0,0,0.08);"></div>
+            </div>
+            <p id="grantStep1Error" style="color:#ef4444;font-size:12px;margin-top:10px;display:none;"></p>
+        </div>
+
+        {{-- Step 2: Select Position --}}
+        <div id="grantStep2" style="display:none;">
+            <div class="modal-title" style="text-align:center;margin-bottom:16px;">Assign Position</div>
+
+            {{-- Selected Student Card --}}
+            <div id="selectedStudentCard" style="display:flex;align-items:center;gap:14px;background:#f0f4ff;border:1.5px solid #c7d4ff;border-radius:10px;padding:14px;margin-bottom:20px;">
+                <div id="selectedAvatar" style="width:44px;height:44px;border-radius:50%;background:#1a2e78;display:flex;align-items:center;justify-content:center;font-weight:700;font-size:18px;color:#fff;flex-shrink:0;"></div>
+                <div>
+                    <div id="selectedName" style="font-weight:700;font-size:15px;color:#1e3a5c;"></div>
+                    <div id="selectedEmail" style="font-size:12px;color:#64748b;"></div>
+                    <div id="selectedStudentNo" style="font-size:12px;color:#94a3b8;"></div>
                 </div>
             </div>
-            <div class="form-group">
-                <div style="display:flex;align-items:center;gap:10px;border:1px solid #e2e8f0;border-radius:8px;padding:10px 14px;background:#f8fafc;">
-                    <svg width="16" height="16" viewBox="0 0 24 24" fill="#94a3b8"><path d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z"/></svg>
-                    <input type="text" id="grantName" class="form-control" placeholder="Enter user name" style="border:none;background:transparent;padding:0;">
-                </div>
+
+            {{-- Position Dropdown --}}
+            <div style="margin-bottom:16px;">
+                <label style="font-size:13px;font-weight:600;color:#374151;display:block;margin-bottom:8px;">Position</label>
+                <select id="grantPosition" style="width:100%;border:1.5px solid #e2e8f0;border-radius:8px;padding:10px 14px;font-size:14px;color:#374151;background:#f8fafc;outline:none;">
+                    <option value="">Select a position</option>
+                    <option>President</option>
+                    <option>Vice President</option>
+                    <option>Secretary</option>
+                    <option>Treasurer</option>
+                    <option>Auditor</option>
+                    <option>Public Relations Officer</option>
+                    <option>Business Manager</option>
+                    <option>Representative</option>
+                    <option>Member</option>
+                </select>
             </div>
-            <div class="form-group">
-                <div style="display:flex;align-items:center;gap:10px;border:1px solid #e2e8f0;border-radius:8px;padding:10px 14px;background:#f8fafc;">
-                    <svg width="16" height="16" viewBox="0 0 24 24" fill="#94a3b8"><path d="M12.65 10C11.83 7.67 9.61 6 7 6c-3.31 0-6 2.69-6 6s2.69 6 6 6c2.61 0 4.83-1.67 5.65-4H17v4h4v-4h2v-4H12.65z"/></svg>
-                    <input type="text" id="grantPosition" class="form-control" placeholder="Enter user position" style="border:none;background:transparent;padding:0;" required>
-                </div>
-            </div>
-            <div id="grantError" style="color:#ef4444;font-size:12px;margin-bottom:10px;display:none;"></div>
+
+            <div id="grantStep2Error" style="color:#ef4444;font-size:12px;margin-bottom:10px;display:none;"></div>
             <div class="modal-actions">
-                <button type="button" class="btn btn-outline" onclick="closeModal('grantModal')">Cancel</button>
-                <button type="submit" class="btn btn-primary">Add User</button>
+                <button type="button" class="btn btn-outline" onclick="backToStep1()">← Back</button>
+                <button type="button" class="btn btn-primary" onclick="submitGrantAccess()">Grant Access</button>
             </div>
-        </form>
+        </div>
     </div>
 </div>
 
@@ -190,36 +216,99 @@ document.getElementById('confirmRemoveAccess').addEventListener('click', functio
     });
 });
 
-document.getElementById('grantForm').addEventListener('submit', function(e) {
-    e.preventDefault();
-    const errEl = document.getElementById('grantError');
+let selectedStudent = null;
+let searchTimeout = null;
+
+function closeGrantModal() {
+    closeModal('grantModal');
+    resetGrantModal();
+}
+
+function resetGrantModal() {
+    selectedStudent = null;
+    document.getElementById('studentSearchInput').value = '';
+    document.getElementById('studentSearchResults').style.display = 'none';
+    document.getElementById('studentSearchResults').innerHTML = '';
+    document.getElementById('grantPosition').value = '';
+    document.getElementById('grantStep1Error').style.display = 'none';
+    document.getElementById('grantStep2Error').style.display = 'none';
+    document.getElementById('grantStep1').style.display = 'block';
+    document.getElementById('grantStep2').style.display = 'none';
+}
+
+function backToStep1() {
+    selectedStudent = null;
+    document.getElementById('grantStep2').style.display = 'none';
+    document.getElementById('grantStep1').style.display = 'block';
+    document.getElementById('grantStep2Error').style.display = 'none';
+}
+
+function searchStudents(q) {
+    clearTimeout(searchTimeout);
+    const resultsEl = document.getElementById('studentSearchResults');
+    if (!q.trim()) { resultsEl.style.display = 'none'; return; }
+
+    searchTimeout = setTimeout(() => {
+        fetch(`/super-admin/students/search?q=${encodeURIComponent(q)}&org_id=${currentOrgId}`, {
+            headers: { 'Accept': 'application/json' }
+        })
+        .then(r => r.json())
+        .then(students => {
+            if (!students.length) {
+                resultsEl.innerHTML = '<div style="padding:16px;text-align:center;color:#94a3b8;font-size:13px;">No students found.</div>';
+            } else {
+                resultsEl.innerHTML = students.map(s => `
+                    <div onclick="selectStudent(${JSON.stringify(s).replace(/"/g, '&quot;')})"
+                         style="display:flex;align-items:center;gap:12px;padding:10px 14px;cursor:pointer;border-bottom:1px solid #f1f5f9;transition:background .15s;"
+                         onmouseover="this.style.background='#f0f4ff'" onmouseout="this.style.background='#fff'">
+                        <div style="width:36px;height:36px;border-radius:50%;background:#1a2e78;display:flex;align-items:center;justify-content:center;font-weight:700;font-size:15px;color:#fff;flex-shrink:0;">
+                            ${s.name.charAt(0).toUpperCase()}
+                        </div>
+                        <div>
+                            <div style="font-weight:600;font-size:13px;color:#1e3a5c;">${s.name}</div>
+                            <div style="font-size:11px;color:#64748b;">${s.email}</div>
+                            <div style="font-size:11px;color:#94a3b8;">${s.student_number} · Year ${s.year_level}</div>
+                        </div>
+                    </div>
+                `).join('');
+            }
+            resultsEl.style.display = 'block';
+        });
+    }, 300);
+}
+
+function selectStudent(student) {
+    selectedStudent = student;
+    document.getElementById('selectedAvatar').textContent = student.name.charAt(0).toUpperCase();
+    document.getElementById('selectedName').textContent = student.name;
+    document.getElementById('selectedEmail').textContent = student.email;
+    document.getElementById('selectedStudentNo').textContent = student.student_number + ' · Year ' + student.year_level;
+    document.getElementById('grantStep1').style.display = 'none';
+    document.getElementById('grantStep2').style.display = 'block';
+}
+
+function submitGrantAccess() {
+    const position = document.getElementById('grantPosition').value;
+    const errEl = document.getElementById('grantStep2Error');
+    if (!position) { errEl.textContent = 'Please select a position.'; errEl.style.display = 'block'; return; }
     errEl.style.display = 'none';
 
     fetch(`/super-admin/organizations/${currentOrgId}/access`, {
         method: 'POST',
-        headers: {
-            'X-CSRF-TOKEN': csrfToken(),
-            'Accept': 'application/json',
-            'Content-Type': 'application/json'
-        },
-        body: JSON.stringify({
-            email: document.getElementById('grantEmail').value,
-            name: document.getElementById('grantName').value,
-            position: document.getElementById('grantPosition').value,
-        })
+        headers: { 'X-CSRF-TOKEN': csrfToken(), 'Accept': 'application/json', 'Content-Type': 'application/json' },
+        body: JSON.stringify({ email: selectedStudent.email, position })
     })
     .then(r => r.json())
     .then(data => {
         if (data.message && !data.errors) {
-            closeModal('grantModal');
-            document.getElementById('grantForm').reset();
+            closeGrantModal();
             loadAccess(currentOrgId, document.getElementById('accessModalTitle').textContent);
         } else {
             errEl.textContent = data.message || 'Something went wrong.';
             errEl.style.display = 'block';
         }
     });
-});
+}
 
 let deleteOrgId = null;
 function confirmDelete(orgId, orgName) {
