@@ -63,16 +63,16 @@ class TrashController extends Controller
         return view('super-admin.trash.students', compact('students'));
     }
 
-    public function restoreOrganization(Organization $organization)
+    public function restoreOrganization($id)
     {
-        Organization::onlyTrashed()->findOrFail($organization->id)->restore();
+        Organization::onlyTrashed()->findOrFail($id)->restore();
 
         return response()->json(['message' => 'Organization restored successfully.']);
     }
 
-    public function forceDeleteOrganization(Organization $organization)
+    public function forceDeleteOrganization($id)
     {
-        $org = Organization::onlyTrashed()->findOrFail($organization->id);
+        $org = Organization::onlyTrashed()->findOrFail($id);
         $org->photos()->each(fn($p) => \Storage::disk('public')->delete($p->photo_path));
         if ($org->logo) \Storage::disk('public')->delete($org->logo);
         $org->forceDelete();
@@ -80,32 +80,32 @@ class TrashController extends Controller
         return response()->json(['message' => 'Organization permanently deleted.']);
     }
 
-    public function restoreEvent(Event $event)
+    public function restoreEvent($id)
     {
-        Event::onlyTrashed()->findOrFail($event->id)->restore();
+        Event::onlyTrashed()->findOrFail($id)->restore();
 
         return response()->json(['message' => 'Event restored successfully.']);
     }
 
-    public function forceDeleteEvent(Event $event)
+    public function forceDeleteEvent($id)
     {
-        $e = Event::onlyTrashed()->findOrFail($event->id);
-        if ($e->poster) \Storage::disk('public')->delete($e->poster);
+        $e = Event::onlyTrashed()->findOrFail($id);
+        if ($e->event_poster) \Storage::disk('public')->delete($e->event_poster);
         $e->forceDelete();
 
         return response()->json(['message' => 'Event permanently deleted.']);
     }
 
-    public function restoreUser(User $user)
+    public function restoreUser($id)
     {
-        User::onlyTrashed()->findOrFail($user->id)->restore();
+        User::onlyTrashed()->findOrFail($id)->restore();
 
         return response()->json(['message' => 'User restored successfully.']);
     }
 
-    public function forceDeleteUser(User $user)
+    public function forceDeleteUser($id)
     {
-        User::onlyTrashed()->findOrFail($user->id)->forceDelete();
+        User::onlyTrashed()->findOrFail($id)->forceDelete();
 
         return response()->json(['message' => 'User permanently deleted.']);
     }
