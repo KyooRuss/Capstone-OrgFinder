@@ -12,6 +12,7 @@ return new class extends Migration
             $table->id();
             $table->foreignId('organization_id')->constrained()->cascadeOnDelete();
             $table->text('testimonial');
+            $table->string('author')->nullable();
             $table->unsignedTinyInteger('order_index')->default(0);
             $table->timestamps();
         });

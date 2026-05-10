@@ -33,7 +33,8 @@
             <thead>
                 <tr>
                     <th>Officer No.</th>
-                    <th>Name</th>
+                    <th>Last Name</th>
+                    <th>First Name</th>
                     <th>Year Level</th>
                     <th>Email Address</th>
                     <th style="text-align:center">Status</th>
@@ -44,8 +45,9 @@
                 @forelse($officers as $i => $officer)
                 <tr>
                     <td><span class="td-no">O{{ str_pad($i + 1, 4, '0', STR_PAD_LEFT) }}</span></td>
-                    <td><span class="td-name">{{ $officer->name }}</span></td>
-                    <td>{{ $officer->year_level ?? '—' }}</td>
+                    <td><span class="td-name">{{ $officer->last_name }}</span></td>
+                    <td><span class="td-name">{{ $officer->first_name }}</span></td>
+                    <td>{{ $officer->profile?->year_level ?? '—' }}</td>
                     <td><span class="td-email">{{ $officer->email }}</span></td>
                     <td style="text-align:center">
                         <span class="status-{{ ($officer->status ?? 'active') === 'active' ? 'active' : 'blocked' }}">

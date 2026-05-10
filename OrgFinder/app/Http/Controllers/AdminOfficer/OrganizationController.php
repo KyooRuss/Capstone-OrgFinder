@@ -5,13 +5,14 @@ namespace App\Http\Controllers\AdminOfficer;
 use App\Http\Controllers\Controller;
 use App\Models\OrganizationPhoto;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Storage;
 
 class OrganizationController extends Controller
 {
     private function myOrganization()
     {
-        return auth()->user()->organizations()->first();
+        return Auth::user()?->organizations()->first();
     }
 
     public function index()
@@ -20,10 +21,10 @@ class OrganizationController extends Controller
 
         $eventPosters = $organization
             ? $organization->events()
-                ->whereNotNull('poster')
+                ->whereNotNull('event_poster')
                 ->where('status', 'approved')
                 ->orderByDesc('date')
-                ->get(['id', 'title', 'date', 'poster'])
+                ->get(['id', 'title', 'date', 'event_poster'])
             : collect();
 
         $testimonials = $organization

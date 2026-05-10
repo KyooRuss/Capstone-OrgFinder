@@ -29,7 +29,8 @@
             <thead>
                 <tr>
                     <th>Student No.</th>
-                    <th>Name</th>
+                    <th>Last Name</th>
+                    <th>First Name</th>
                     <th>Year Level</th>
                     <th>Email Address</th>
                     <th>Status</th>
@@ -40,7 +41,8 @@
                 @forelse($students as $student)
                 <tr>
                     <td style="font-weight:600;color:#1e3a5c;">{{ $student['student_number'] }}</td>
-                    <td><span style="color:#3b82f6;font-weight:600;">{{ $student['name'] }}</span></td>
+                    <td><span style="color:#3b82f6;font-weight:600;">{{ $student['last_name'] }}</span></td>
+                    <td><span style="color:#3b82f6;font-weight:600;">{{ $student['first_name'] }}</span></td>
                     <td>{{ $student['year_level'] }}</td>
                     <td>{{ $student['email'] }}</td>
                     <td>
@@ -53,7 +55,7 @@
                     <td style="text-align:center;">
                         <div style="display:flex;gap:6px;justify-content:center;align-items:center;">
                             @if($student['status'] === 'active')
-                                <button class="icon-btn" title="Block" onclick="confirmBlock({{ $student['id'] }}, '{{ addslashes($student['name']) }}')">
+                                <button class="icon-btn" title="Block" onclick="confirmBlock({{ $student['id'] }}, '{{ addslashes($student['first_name'] . ' ' . $student['last_name']) }}')">
                                     <svg viewBox="0 0 24 24" fill="#94a3b8" width="20" height="20"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm5 11H7v-2h10v2z"/></svg>
                                 </button>
                             @else
@@ -61,7 +63,7 @@
                                     <svg viewBox="0 0 24 24" fill="#22c55e" width="20" height="20"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm5 11H7v-2h10v2z"/></svg>
                                 </button>
                             @endif
-                            <button class="icon-btn" title="Delete" onclick="confirmDelete({{ $student['id'] }}, '{{ addslashes($student['name']) }}')">
+                            <button class="icon-btn" title="Delete" onclick="confirmDelete({{ $student['id'] }}, '{{ addslashes($student['first_name'] . ' ' . $student['last_name']) }}')">
                                 <svg viewBox="0 0 24 24" fill="#ef4444" width="18" height="18"><path d="M6 19c0 1.1.9 2 2 2h8c1.1 0 2-.9 2-2V7H6v12zM19 4h-3.5l-1-1h-5l-1 1H5v2h14V4z"/></svg>
                             </button>
                         </div>

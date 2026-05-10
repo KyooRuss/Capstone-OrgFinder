@@ -20,7 +20,9 @@
         <table>
             <thead>
                 <tr>
-                    <th>Name</th>
+                    <th>Student No.</th>
+                    <th>Last Name</th>
+                    <th>First Name</th>
                     <th>Email</th>
                     <th>Year Level</th>
                     <th>Status</th>
@@ -30,14 +32,16 @@
             <tbody>
                 @forelse($students as $student)
                 <tr>
-                    <td><span style="color:#3b82f6;font-weight:600;">{{ $student->name }}</span></td>
+                    <td style="font-weight:600;color:#1e3a5c;">{{ $student->profile?->student_number ?? '—' }}</td>
+                    <td><span style="color:#3b82f6;font-weight:600;">{{ $student->last_name }}</span></td>
+                    <td><span style="color:#3b82f6;font-weight:600;">{{ $student->first_name }}</span></td>
                     <td>{{ $student->email }}</td>
-                    <td>{{ $student->year_level ?? '—' }}</td>
+                    <td>{{ $student->profile?->year_level ?? '—' }}</td>
                     <td><span class="badge badge-danger">Removed</span></td>
                     <td style="text-align:center;">
                         <div style="display:flex;gap:8px;justify-content:center;">
                             <button class="btn btn-success btn-sm" onclick="restoreUser({{ $student->id }})">Restore</button>
-                            <button class="btn btn-danger btn-sm" onclick="confirmForceDelete({{ $student->id }}, '{{ addslashes($student->name) }}')">Delete</button>
+                            <button class="btn btn-danger btn-sm" onclick="confirmForceDelete({{ $student->id }}, '{{ addslashes($student->first_name . " " . $student->last_name) }}')">Delete</button>
                         </div>
                     </td>
                 </tr>

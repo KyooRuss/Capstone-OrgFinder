@@ -158,15 +158,19 @@
                     </div>
 
                     <div style="flex:1;">
-                        <input type="text" name="name" class="form-control" placeholder="Enter the organization name" value="{{ old('name') }}" required style="margin-bottom:10px;">
+                        <input type="text" name="org_name" class="form-control" placeholder="Enter the organization name" value="{{ old('org_name') }}" required style="margin-bottom:10px;">
+                        <input type="text" name="president" class="form-control" placeholder="President's full name" value="{{ old('president') }}" style="margin-bottom:10px;">
                         @include('super-admin.partials.category-select', ['selectedCategories' => old('categories', [])])
-                        <div style="margin-top:10px;">
-                            <textarea name="vision" class="form-control" placeholder="Enter the organization's vision" rows="2">{{ old('vision') }}</textarea>
-                        </div>
                     </div>
                 </div>
                 <div style="margin-top:12px;">
-                    <textarea name="mission" class="form-control" placeholder="Enter the organization's mission" rows="3">{{ old('mission') }}</textarea>
+                    <textarea name="vision" class="form-control" placeholder="Organization's vision" rows="2">{{ old('vision') }}</textarea>
+                </div>
+                <div style="margin-top:12px;">
+                    <textarea name="mission" class="form-control" placeholder="Organization's mission" rows="3">{{ old('mission') }}</textarea>
+                </div>
+                <div style="margin-top:12px;">
+                    <textarea name="description" class="form-control" placeholder="Short description of the organization" rows="3">{{ old('description') }}</textarea>
                 </div>
                 <div class="inline-fields" style="margin-top:12px;">
                     <input type="text" name="room_number" class="form-control" placeholder="Org's room number" value="{{ old('room_number') }}">
@@ -222,6 +226,17 @@
         {{-- RIGHT COLUMN --}}
         <div>
             <div class="card" style="margin-bottom:20px;">
+                <p class="section-title">Program Eligibility</p>
+                <p style="font-size:12px;color:#94a3b8;margin-bottom:12px;">Select which programs can join this org. Leave empty to allow all programs.</p>
+                @php $programs = ['BSIT','BSCS','BSIS','BSCpE','BSCE','BSEE','BSME','BSN','BSBA','BSA']; @endphp
+                @include('super-admin.partials.program-select', [
+                    'programs'        => $programs,
+                    'selectedPrograms'=> old('eligible_programs', []),
+                    'inputId'         => 'programSelect',
+                ])
+            </div>
+
+            <div class="card" style="margin-bottom:20px;">
                 <p class="section-title">Reasons to Join</p>
                 <div id="reasonsList">
                     @for($i = 0; $i < 3; $i++)
@@ -237,17 +252,6 @@
                         Add Reason
                     </button>
                 </div>
-            </div>
-
-            <div class="card" style="margin-bottom:20px;">
-                <p class="section-title">Program Eligibility</p>
-                <p style="font-size:12px;color:#94a3b8;margin-bottom:12px;">Select which programs can join this org. Leave empty to allow all programs.</p>
-                @php $programs = ['BSIT','BSCS','BSIS','BSCpE','BSCE','BSEE','BSME','BSN','BSBA','BSA']; @endphp
-                @include('super-admin.partials.program-select', [
-                    'programs'        => $programs,
-                    'selectedPrograms'=> old('eligible_programs', []),
-                    'inputId'         => 'programSelect',
-                ])
             </div>
 
             <div class="card">

@@ -8,10 +8,10 @@ return new class extends Migration
 {
     public function up(): void
     {
-        Schema::create('event_gains', function (Blueprint $table) {
+        Schema::create('event_benefits', function (Blueprint $table) {
             $table->id();
             $table->foreignId('event_id')->constrained()->cascadeOnDelete();
-            $table->text('gain');
+            $table->text('benefit');
             $table->unsignedTinyInteger('order_index')->default(0);
             $table->timestamps();
         });

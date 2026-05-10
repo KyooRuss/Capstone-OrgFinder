@@ -37,7 +37,8 @@
             <thead>
                 <tr>
                     <th>Member No.</th>
-                    <th>Name</th>
+                    <th>Last Name</th>
+                    <th>First Name</th>
                     <th>Year Level</th>
                     <th>Email Address</th>
                     <th style="text-align:center">Status</th>
@@ -48,8 +49,9 @@
                 @forelse($members as $i => $member)
                 <tr>
                     <td><span class="td-no">M{{ str_pad($i + 1, 4, '0', STR_PAD_LEFT) }}</span></td>
-                    <td><span class="td-name">{{ $member->name }}</span></td>
-                    <td>{{ $member->year_level ?? '—' }}</td>
+                    <td><span class="td-name">{{ $member->last_name }}</span></td>
+                    <td><span class="td-name">{{ $member->first_name }}</span></td>
+                    <td>{{ $member->profile?->year_level ?? '—' }}</td>
                     <td><span class="td-email">{{ $member->email }}</span></td>
                     <td style="text-align:center">
                         <span class="status-{{ ($member->status ?? 'active') === 'active' ? 'active' : 'blocked' }}">
@@ -59,7 +61,7 @@
                     <td style="text-align:center;white-space:nowrap;">
                         @if(($member->status ?? 'active') === 'active')
                         <button class="icon-btn" title="Block"
-                            onclick="confirmBlock({{ $member->id }}, '{{ addslashes($member->name) }}')">
+                            onclick="confirmBlock({{ $member->id }}, '{{ addslashes($member['first_name'] . ' ' . $member['last_name']) }}')">
                             <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#e96500" stroke-width="2">
                                 <circle cx="12" cy="12" r="10"/><line x1="4.93" y1="4.93" x2="19.07" y2="19.07"/>
                             </svg>
@@ -72,7 +74,7 @@
                         </button>
                         @endif
                         <button class="icon-btn" title="Remove"
-                            onclick="confirmRemove({{ $member->id }}, '{{ addslashes($member->name) }}')">
+                            onclick="confirmRemove({{ $member->id }}, '{{ addslashes($member['first_name'] . ' ' . $member['last_name']) }}')">
                             <svg width="20" height="20" viewBox="0 0 24 24" fill="#475569">
                                 <path d="M6 19c0 1.1.9 2 2 2h8c1.1 0 2-.9 2-2V7H6v12zM19 4h-3.5l-1-1h-5l-1 1H5v2h14V4z"/>
                             </svg>

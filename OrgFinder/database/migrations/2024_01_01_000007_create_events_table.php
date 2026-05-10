@@ -12,12 +12,11 @@ return new class extends Migration
             $table->id();
             $table->foreignId('organization_id')->constrained()->cascadeOnDelete();
             $table->string('title');
-            $table->text('description')->nullable();
+            $table->text('description');
             $table->date('date');
-            $table->time('start_time');
-            $table->time('end_time')->nullable();
-            $table->string('location')->nullable();
-            $table->string('poster')->nullable();
+            $table->time('time');
+            $table->string('venue');
+            $table->string('event_poster');
             $table->enum('status', ['pending', 'approved', 'rejected'])->default('pending');
             $table->timestamps();
             $table->softDeletes();

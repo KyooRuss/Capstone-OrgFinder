@@ -5,13 +5,14 @@ namespace App\Http\Controllers\AdminOfficer;
 use App\Http\Controllers\Controller;
 use App\Models\OrganizationAccess;
 use App\Models\User;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Http\Request;
 
 class MemberController extends Controller
 {
     private function myOrganization()
     {
-        return auth()->user()->organizations()->first();
+        return Auth::user()?->organizations()->first();
     }
 
     public function index(Request $request)
@@ -27,7 +28,8 @@ class MemberController extends Controller
 
         if ($request->filled('search')) {
             $query->where(function ($q) use ($request) {
-                $q->where('name', 'like', '%' . $request->search . '%')
+                $q->where('last_name', 'like', '%' . $request->search . '%')
+                  ->orwhere('first_name', 'like', '%' . $request->search . '%')
                   ->orWhere('email', 'like', '%' . $request->search . '%');
             });
         }
@@ -36,7 +38,7 @@ class MemberController extends Controller
             $query->where('status', $request->status);
         }
 
-        $members = $query->orderBy('name')->get();
+        $members = $query->orderBy('last_name')->get();
 
         return view('admin-officer.members.index', compact('members', 'org'));
     }

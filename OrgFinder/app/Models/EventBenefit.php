@@ -4,9 +4,9 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
 
-class EventGain extends Model
+class EventBenefit extends Model
 {
-    protected $fillable = ['event_id', 'gain', 'order_index'];
+    protected $fillable = ['event_id', 'benefit', 'order_index'];
 
     public function event()
     {

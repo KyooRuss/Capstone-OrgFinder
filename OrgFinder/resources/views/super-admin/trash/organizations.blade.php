@@ -29,7 +29,7 @@
             <tbody>
                 @forelse($organizations as $org)
                 <tr>
-                    <td><span style="color:#3b82f6;font-weight:600;">{{ $org->name }}</span></td>
+                    <td><span style="color:#3b82f6;font-weight:600;">{{ $org->org_name }}</span></td>
                     <td style="text-align:center">{{ $org->members_count }}</td>
                     <td style="text-align:center">{{ $org->events_count }}</td>
                     <td style="text-align:center;">

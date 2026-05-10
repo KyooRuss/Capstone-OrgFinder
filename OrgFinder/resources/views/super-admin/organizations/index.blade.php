@@ -33,19 +33,19 @@
                 <tr>
                     <td>
                         <span class="td-link" onclick="loadAccess({{ $org->id }}, '{{ addslashes($org->name) }}')">
-                            {{ $org->name }}
+                            {{ $org->org_name }}
                         </span>
                     </td>
                     <td style="text-align:center">{{ $org->members_count }}</td>
                     <td style="text-align:center">{{ $org->events_count }}</td>
                     <td style="text-align:center">
-                        <button class="icon-btn" title="Manage Access" onclick="loadAccess({{ $org->id }}, '{{ addslashes($org->name) }}')">
+                        <button class="icon-btn" title="Manage Access" onclick="loadAccess({{ $org->id }}, '{{ addslashes($org->org_name) }}')">
                             <svg viewBox="0 0 24 24" fill="#f59e0b"><path d="M12.65 10C11.83 7.67 9.61 6 7 6c-3.31 0-6 2.69-6 6s2.69 6 6 6c2.61 0 4.83-1.67 5.65-4H17v4h4v-4h2v-4H12.65zM7 14c-1.1 0-2-.9-2-2s.9-2 2-2 2 .9 2 2-.9 2-2 2z"/></svg>
                         </button>
                         <a href="{{ route('super-admin.organizations.edit', $org) }}" class="icon-btn" title="Edit">
                             <svg viewBox="0 0 24 24" fill="#4A6CF7" width="18" height="18"><path d="M3 17.25V21h3.75L17.81 9.94l-3.75-3.75L3 17.25zM20.71 7.04c.39-.39.39-1.02 0-1.41l-2.34-2.34c-.39-.39-1.02-.39-1.41 0l-1.83 1.83 3.75 3.75 1.83-1.83z"/></svg>
                         </a>
-                        <button class="icon-btn" title="Delete" onclick="confirmDelete({{ $org->id }}, '{{ addslashes($org->name) }}')">
+                        <button class="icon-btn" title="Delete" onclick="confirmDelete({{ $org->id }}, '{{ addslashes($org->org_name) }}')">
                             <svg viewBox="0 0 24 24" fill="#ef4444"><path d="M6 19c0 1.1.9 2 2 2h8c1.1 0 2-.9 2-2V7H6v12zM19 4h-3.5l-1-1h-5l-1 1H5v2h14V4z"/></svg>
                         </button>
                     </td>
@@ -267,7 +267,7 @@ function searchStudents(q) {
                         <div>
                             <div style="font-weight:600;font-size:13px;color:#1e3a5c;">${s.name}</div>
                             <div style="font-size:11px;color:#64748b;">${s.email}</div>
-                            <div style="font-size:11px;color:#94a3b8;">${s.student_number} · Year ${s.year_level}</div>
+                            <div style="font-size:11px;color:#94a3b8;">Year ${s.year_level}</div>
                         </div>
                     </div>
                 `).join('');
@@ -282,7 +282,7 @@ function selectStudent(student) {
     document.getElementById('selectedAvatar').textContent = student.name.charAt(0).toUpperCase();
     document.getElementById('selectedName').textContent = student.name;
     document.getElementById('selectedEmail').textContent = student.email;
-    document.getElementById('selectedStudentNo').textContent = student.student_number + ' · Year ' + student.year_level;
+    document.getElementById('selectedStudentNo').textContent = 'Year ' + student.year_level;
     document.getElementById('grantStep1').style.display = 'none';
     document.getElementById('grantStep2').style.display = 'block';
 }

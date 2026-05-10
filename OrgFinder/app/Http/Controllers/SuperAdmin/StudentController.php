@@ -4,6 +4,7 @@ namespace App\Http\Controllers\SuperAdmin;
 
 use App\Http\Controllers\Controller;
 use App\Models\User;
+use App\Models\UserProfile;
 use Illuminate\Http\Request;
 
 class StudentController extends Controller
@@ -13,23 +14,26 @@ class StudentController extends Controller
         $query = User::where('role', 'student');
 
         if ($request->filled('search')) {
-            $query->where('name', 'like', '%' . $request->search . '%');
+            $query->where('last_name', 'like', '%' . $request->search . '%')
+                  ->orWhere('first_name', 'like', '%' . $request->search . '%');
         }
 
         if ($request->filled('filter') && in_array($request->filter, ['active', 'blocked'])) {
             $query->where('status', $request->filter);
         }
 
-        $students = $query->latest()->get()->map(function ($user, $index) {
+        $students = $query->with('profile')->latest()->get()->map(function ($user, $index) {
             return [
                 'id'             => $user->id,
-                'student_number' => $user->student_number ?? 'S' . str_pad($index + 1, 4, '0', STR_PAD_LEFT),
-                'name'           => $user->name,
-                'year_level'     => $user->year_level ?? '—',
+                'student_number' => $user->profile?->student_number ?? 'S' . str_pad($index + 1, 4, '0', STR_PAD_LEFT),
+                'first_name'     => $user->first_name,
+                'last_name'      => $user->last_name,
+                'year_level'     => $user->profile?->year_level ?? '—',
                 'email'          => $user->email,
                 'status'         => $user->status,
             ];
         });
+
 
         return view('super-admin.students.index', compact('students'));
     }
@@ -42,23 +46,22 @@ class StudentController extends Controller
         $query = User::where('role', 'student')
             ->where('status', 'active')
             ->where(function ($query) use ($q) {
-                $query->where('name', 'like', "%{$q}%")
-                      ->orWhere('email', 'like', "%{$q}%")
-                      ->orWhere('student_number', 'like', "%{$q}%");
+                $query->where('first_name', 'like', "%{$q}%")
+                      ->orWhere('last_name', 'like', "%{$q}%")
+                      ->orWhere('email', 'like', "%{$q}%");
             });
 
         if ($excludeOrgId) {
-            $query->whereDoesntHave('organizationAccess', function ($q) use ($excludeOrgId) {
-                $q->where('organization_id', $excludeOrgId);
+            $query->whereDoesntHave('organizationAccess', function ($sub) use ($excludeOrgId) {
+                $sub->where('organization_id', $excludeOrgId);
             });
         }
 
-        $students = $query->limit(8)->get()->map(fn($u) => [
-            'id'             => $u->id,
-            'name'           => $u->name,
-            'email'          => $u->email,
-            'student_number' => $u->student_number ?? '—',
-            'year_level'     => $u->year_level ?? '—',
+        $students = $query->with('profile')->limit(8)->get()->map(fn($u) => [
+            'id'         => $u->id,
+            'name'       => trim($u->first_name . ' ' . $u->last_name),
+            'email'      => $u->email,
+            'year_level' => $u->profile?->year_level ?? '—',
         ]);
 
         return response()->json($students);

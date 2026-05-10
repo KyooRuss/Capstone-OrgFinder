@@ -27,8 +27,9 @@ class AdminOfficerController extends Controller
             return [
                 'id'           => $user->id,
                 'admin_number' => 'A' . str_pad($index + 1, 4, '0', STR_PAD_LEFT),
-                'name'         => $user->name,
-                'organization' => $access?->organization?->name ?? '—',
+                'last_name'    => $user->last_name,
+                'first_name'   => $user->first_name,
+                'organization' => $access?->organization?->org_name ?? '—',
                 'position'     => $access?->position ?? '—',
                 'status'       => $user->status,
             ];

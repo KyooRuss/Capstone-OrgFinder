@@ -42,10 +42,10 @@
             <tbody>
                 @forelse($events as $event)
                 <tr>
-                    <td>{{ $event->organization->name }}</td>
+                    <td>{{ $event->organization->org_name }}</td>
                     <td>{{ $event->title }}</td>
                     <td>{{ $event->date->format('m-d-Y') }}</td>
-                    <td>{{ date('g:i A', strtotime($event->start_time)) }}</td>
+                    <td>{{ date('g:i A', strtotime($event->time)) }}</td>
                     <td>
                         <span class="badge badge-{{ $event->status }}">
                             {{ ucfirst($event->status) }}
@@ -122,12 +122,12 @@ function viewEvent(id) {
     .then(e => {
         document.getElementById('eventTitle').textContent = `${e.title} (${e.organization})`;
         document.getElementById('eventDate').textContent = '📅 ' + e.date;
-        document.getElementById('eventTime').textContent = '🕐 ' + e.start_time + (e.end_time ? ' – ' + e.end_time : '');
-        document.getElementById('eventLocation').textContent = '📍 ' + (e.location || 'TBA');
+        document.getElementById('eventTime').textContent = '🕐 ' + (e.time || 'TBA');
+        document.getElementById('eventLocation').textContent = '📍 ' + (e.venue || 'TBA');
         document.getElementById('eventDesc').textContent = e.description || '';
 
         const gainsEl = document.getElementById('eventGains');
-        gainsEl.innerHTML = (e.gains || []).map(g => `<li>${g}</li>`).join('');
+        gainsEl.innerHTML = (e.benefits || []).map(g => `<li>${g}</li>`).join('');
 
         const poster = document.getElementById('eventPoster');
         if (e.poster) { poster.src = e.poster; poster.style.display = 'block'; }

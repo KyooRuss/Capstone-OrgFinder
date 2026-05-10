@@ -32,7 +32,7 @@ class OrganizationController extends Controller
     public function store(Request $request)
     {
         $validated = $request->validate([
-            'name'              => ['required', 'string', 'max:255'],
+            'org_name'          => ['required', 'string', 'max:255'],
             'categories'        => ['nullable', 'array', 'max:5'],
             'categories.*'      => ['string', 'max:255'],
             'vision'            => ['nullable', 'string'],
@@ -57,7 +57,7 @@ class OrganizationController extends Controller
         }
 
         $organization = Organization::create([
-            'name'              => $validated['name'],
+            'org_name'          => $validated['org_name'],
             'category'          => array_filter($validated['categories'] ?? []) ?: null,
             'vision'            => $validated['vision'] ?? null,
             'mission'           => $validated['mission'] ?? null,
@@ -106,11 +106,11 @@ class OrganizationController extends Controller
     public function update(Request $request, Organization $organization)
     {
         $validated = $request->validate([
-            'name'              => ['required', 'string', 'max:255'],
+            'org_name'          => ['required', 'string', 'max:255'],
             'categories'        => ['nullable', 'array', 'max:5'],
             'categories.*'      => ['string', 'max:255'],
             'vision'            => ['nullable', 'string'],
-            'mission'          => ['nullable', 'string'],
+            'mission'           => ['nullable', 'string'],
             'room_number'       => ['nullable', 'string', 'max:100'],
             'contact_telegram'  => ['nullable', 'string', 'max:255'],
             'contact_facebook'  => ['nullable', 'string', 'max:255'],
@@ -132,7 +132,7 @@ class OrganizationController extends Controller
         }
 
         $organization->update([
-            'name'              => $validated['name'],
+            'org_name'          => $validated['org_name'],
             'category'          => array_filter($validated['categories'] ?? []) ?: null,
             'vision'            => $validated['vision'] ?? null,
             'mission'           => $validated['mission'] ?? null,
@@ -183,7 +183,8 @@ class OrganizationController extends Controller
             return [
                 'id'       => $a->id,
                 'user_id'  => $a->user_id,
-                'name'     => $a->user->name,
+                'last_name'=> $a->user->last_name,
+                'first_name'=> $a->user->first_name,
                 'email'    => $a->user->email,
                 'position' => $a->position,
                 'avatar'   => $a->user->name,
@@ -191,7 +192,7 @@ class OrganizationController extends Controller
         });
 
         return response()->json([
-            'organization' => $organization->name,
+            'organization' => $organization->org_name,
             'access'       => $access,
         ]);
     }
@@ -200,7 +201,8 @@ class OrganizationController extends Controller
     {
         $validated = $request->validate([
             'email'    => ['required', 'email', 'exists:users,email'],
-            'name'     => ['nullable', 'string'],
+            'last_name' => ['nullable', 'string'],
+            'first_name' => ['nullable', 'string'],
             'position' => ['required', 'string', 'max:100'],
         ]);
 

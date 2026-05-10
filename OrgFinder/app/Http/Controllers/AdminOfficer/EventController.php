@@ -4,14 +4,15 @@ namespace App\Http\Controllers\AdminOfficer;
 
 use App\Http\Controllers\Controller;
 use App\Models\Event;
-use App\Models\EventGain;
+use App\Models\EventBenefit;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Http\Request;
 
 class EventController extends Controller
 {
     private function myOrganization()
     {
-        return auth()->user()->organizations()->first();
+        return Auth::user()?->organizations()->first();
     }
 
     public function index(Request $request)
@@ -41,21 +42,18 @@ class EventController extends Controller
     {
         $this->authorizeEvent($event);
 
-        $event->load('gains');
+        $event->load('benefits');
 
         return response()->json([
             'id'          => $event->id,
             'title'       => $event->title,
             'description' => $event->description,
             'date'        => $event->date?->format('D, F j, Y'),
-            'time'        => $event->start_time
-                ? date('g:i A', strtotime($event->start_time)) .
-                  ($event->end_time ? ' - ' . date('g:i A', strtotime($event->end_time)) : '')
-                : null,
-            'venue'       => $event->location,
+            'time'        => $event->time ? date('g:i A', strtotime($event->time)): null,
+            'venue'       => $event->venue,
             'status'      => $event->status,
-            'image_url'   => $event->poster ? asset('storage/' . $event->poster) : null,
-            'gains'       => $event->gains->pluck('gain')->implode("\n"),
+            'image_url'   => $event->event_poster ? asset('storage/' . $event->event_poster) : null,
+            'benefits'    => $event->benefits->pluck('benefit')->implode("\n"),
         ]);
     }
 
@@ -63,13 +61,17 @@ class EventController extends Controller
     {
         $org = $this->myOrganization();
 
+        if (!$org) {
+            return response()->json(['success' => false, 'message' => 'You are not associated with any organization.'], 422);
+        }
+
         $data = $request->validate([
             'title'       => ['required', 'string', 'max:255'],
             'date'        => ['required', 'date'],
             'time'        => ['nullable', 'string'],
             'venue'       => ['nullable', 'string', 'max:255'],
             'description' => ['nullable', 'string'],
-            'gains'       => ['nullable', 'string'],
+            'benefits'    => ['nullable', 'string'],
             'image'       => ['nullable', 'image', 'max:4096'],
         ]);
 
@@ -82,18 +84,18 @@ class EventController extends Controller
             'organization_id' => $org->id,
             'title'           => $data['title'],
             'date'            => $data['date'],
-            'start_time'      => $data['time'] ?? null,
-            'location'        => $data['venue'] ?? null,
+            'time'            => $data['time'] ?? null,
+            'venue'           => $data['venue'] ?? null,
             'description'     => $data['description'] ?? null,
-            'poster'          => $posterPath,
+            'event_poster'    => $posterPath,
             'status'          => 'pending',
         ]);
 
-        if (!empty($data['gains'])) {
-            foreach (array_filter(explode("\n", $data['gains'])) as $i => $gain) {
-                EventGain::create([
+        if (!empty($data['benefits'])) {
+            foreach (array_filter(explode("\n", $data['benefits'])) as $i => $benefit) {
+                EventBenefit::create([
                     'event_id'    => $event->id,
-                    'gain'        => trim($gain),
+                    'benefit'     => trim($benefit),
                     'order_index' => $i,
                 ]);
             }
@@ -113,6 +115,6 @@ class EventController extends Controller
     private function authorizeEvent(Event $event): void
     {
         $org = $this->myOrganization();
-        abort_if($event->organization_id !== $org->id, 403);
+        abort_if(!$org || $event->organization_id !== $org->id, 403);
     }
 }

@@ -62,4 +62,8 @@ class User extends Authenticatable
     {
         return $this->belongsToMany(Organization::class, 'organization_access')->withPivot('position');
     }
+    public function profile()
+    {
+        return $this->hasOne(UserProfile::class);
+    }
 }

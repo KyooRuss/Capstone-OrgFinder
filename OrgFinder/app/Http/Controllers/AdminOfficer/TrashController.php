@@ -4,13 +4,14 @@ namespace App\Http\Controllers\AdminOfficer;
 
 use App\Http\Controllers\Controller;
 use App\Models\User;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Http\Request;
 
 class TrashController extends Controller
 {
     private function myOrganization()
     {
-        return auth()->user()->organizations()->first();
+        return Auth::user()?->organizations()->first();
     }
 
     public function members(Request $request)
@@ -36,7 +37,7 @@ class TrashController extends Controller
             $query->where('status', $request->status);
         }
 
-        $members = $query->orderBy('name')->get();
+        $members = $query->orderBy('last_name')->get();
 
         return view('admin-officer.trash.members', compact('members', 'org'));
     }
@@ -64,7 +65,7 @@ class TrashController extends Controller
             $query->where('status', $request->status);
         }
 
-        $officers = $query->orderBy('name')->get();
+        $officers = $query->orderBy('last_name')->get();
 
         return view('admin-officer.trash.officers', compact('officers', 'org'));
     }

@@ -46,20 +46,19 @@ class EventController extends Controller
 
     public function show(Event $event)
     {
-        $event->load(['organization', 'gains']);
+        $event->load(['organization', 'benefits']);
 
         return response()->json([
             'id'           => $event->id,
             'title'        => $event->title,
-            'organization' => $event->organization->name,
+            'organization' => $event->organization->org_name,
             'description'  => $event->description,
             'date'         => $event->date->format('D, F j, Y'),
-            'start_time'   => date('g:i A', strtotime($event->start_time)),
-            'end_time'     => $event->end_time ? date('g:i A', strtotime($event->end_time)) : null,
-            'location'     => $event->location,
-            'poster'       => $event->poster ? asset('storage/' . $event->poster) : null,
+            'time'         => $event->time ? date('g:i A', strtotime($event->time)): null,
+            'venue'        => $event->venue,
+            'poster'       => $event->event_poster ? asset('storage/' . $event->event_poster) : null,
             'status'       => $event->status,
-            'gains'        => $event->gains->pluck('gain'),
+            'benefits'     => $event->benefits->pluck('benefit'),
         ]);
     }
 

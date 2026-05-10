@@ -40,6 +40,8 @@
                     <th>Event No.</th>
                     <th>Event Title</th>
                     <th>Date</th>
+                    <th>Time</th>
+                    <th>Venue</th>
                     <th style="text-align:center">Status</th>
                     <th style="text-align:center">Action</th>
                 </tr>
@@ -48,10 +50,10 @@
                 @forelse($events as $i => $event)
                 <tr>
                     <td><span class="td-no">E{{ str_pad($i + 1, 4, '0', STR_PAD_LEFT) }}</span></td>
-                    <td>
-                        <span class="td-name" onclick="viewEvent({{ $event->id }})">{{ $event->title }}</span>
-                    </td>
+                    <td><span class="td-name" onclick="viewEvent({{ $event->id }})">{{ $event->title }}</span></td>
                     <td>{{ \Carbon\Carbon::parse($event->date)->format('n-d-Y') }}</td>
+                    <td>{{ $event->date->format('m-d-Y') }}</td>
+                    <td>{{ $event->venue }}</td>
                     <td style="text-align:center">
                         <span class="status-{{ $event->status }}">{{ ucfirst($event->status) }}</span>
                     </td>
@@ -139,7 +141,7 @@
                         <textarea name="description" class="form-control" rows="3" placeholder="About This Event" style="resize:none;"></textarea>
                     </div>
                     <div class="form-group">
-                        <textarea name="gains" class="form-control" rows="3" placeholder="What you will gain (one per line)" style="resize:none;"></textarea>
+                        <textarea name="benefits" class="form-control" rows="3" placeholder="What you will gain (one per line)" style="resize:none;"></textarea>
                     </div>
                     <div id="createEventError" style="color:#ef4444;font-size:12px;margin-bottom:8px;display:none;"></div>
                     <div style="text-align:right;">
@@ -171,8 +173,8 @@ function viewEvent(id) {
             el('detailAbout').textContent = data.description || '';
             const gainsList = el('detailGains');
             gainsList.innerHTML = '';
-            if (data.gains) {
-                data.gains.split('\n').filter(g => g.trim()).forEach(g => {
+            if (data.benefits) {
+                data.benefits.split('\n').filter(g => g.trim()).forEach(g => {
                     const li = document.createElement('li');
                     li.textContent = g.trim();
                     gainsList.appendChild(li);

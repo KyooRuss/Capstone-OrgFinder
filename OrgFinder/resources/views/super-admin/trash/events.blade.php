@@ -23,6 +23,8 @@
                     <th>Organization</th>
                     <th>Event Title</th>
                     <th>Date</th>
+                    <th>Time</th>
+                    <th>Venue</th>
                     <th>Status</th>
                     <th style="text-align:center">Action</th>
                 </tr>
@@ -30,9 +32,11 @@
             <tbody>
                 @forelse($events as $event)
                 <tr>
-                    <td>{{ $event->organization->name }}</td>
+                    <td>{{ $event->organization->org_name }}</td>
                     <td><span style="color:#3b82f6;font-weight:600;">{{ $event->title }}</span></td>
                     <td>{{ $event->date->format('m-d-Y') }}</td>
+                    <td>{{ $event->time ? date('g:i A', strtotime($event->time)) : '—' }}</td>
+                    <td>{{ $event->venue }}</td>
                     <td><span class="badge badge-{{ $event->status }}">{{ ucfirst($event->status) }}</span></td>
                     <td style="text-align:center;">
                         <div style="display:flex;gap:8px;justify-content:center;">
