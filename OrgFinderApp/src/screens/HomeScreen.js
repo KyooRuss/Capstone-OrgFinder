@@ -61,39 +61,18 @@ export default function HomeScreen({ navigation }) {
                 {/* Info */}
                 <View style={styles.orgInfo}>
                     <Text style={styles.orgName} numberOfLines={2}>
-                        {item.organization?.org_name}</Text>
+                        {item.name}</Text>
                     {item.category ? (
                     <Text style={styles.categoryTag}>
                         {Array.isArray(item.category) ? item.category.join(', ') : item.category}
                     </Text>
                     ) : null}
                 </View>
-
-                {/* Match % */}
-                {item.match_pct > 0 ? (
-                    <View style={[styles.matchBadge, { borderColor: getMatchColor(item.match_pct) }]}>
-                        <Text style={[styles.matchPct, { color: getMatchColor(item.match_pct) }]}>
-                            {item.match_pct}%
-                        </Text>
-                        <Text style={[styles.matchLabel, { color: getMatchColor(item.match_pct) }]}>match</Text>
-                    </View>
-                ) : null}
             </View>
 
             {/* Match reason */}
             {item.match_reason ? (
                 <Text style={styles.matchReason} numberOfLines={1}>{item.match_reason}</Text>
-            ) : null}
-
-            {/* Match tags */}
-            {item.match_tags?.length > 0 ? (
-                <View style={styles.tagsRow}>
-                    {item.match_tags.slice(0, 3).map((tag, i) => (
-                        <View key={i} style={styles.tag}>
-                            <Text style={styles.tagText}>{tag}</Text>
-                        </View>
-                    ))}
-                </View>
             ) : null}
         </TouchableOpacity>
     );
@@ -201,7 +180,7 @@ export default function HomeScreen({ navigation }) {
 const styles = StyleSheet.create({
     root: { flex: 1, backgroundColor: '#f0f2ff' },
      // Header
-    header: { paddingHorizontal: 20, paddingBottom: 10 },
+    header: { paddingHorizontal: 20 },
     headerRow: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', paddingTop: 10 },
     greeting: { fontSize: 22, fontWeight: '600', color: '#fff' },
     subGreeting: { fontSize: 13, color: 'rgba(255,255,255,0.75)', marginTop: 2 },
@@ -216,7 +195,7 @@ const styles = StyleSheet.create({
         backgroundColor: '#fff',
         borderRadius: 18,
         marginHorizontal: 20,
-        marginTop: -20,
+        marginTop: -50,
         paddingVertical: 16,
         paddingHorizontal: 20,
         shadowColor: '#4A6CF7',
@@ -235,7 +214,7 @@ const styles = StyleSheet.create({
     mascotRow: {
         flexDirection: 'row',
         alignItems: 'center',
-        marginTop: 10,
+        marginTop: 15,
         marginBottom: 4,
     },
     mascotImg: { width: 130, height: 130 },

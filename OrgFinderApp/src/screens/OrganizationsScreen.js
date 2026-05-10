@@ -34,21 +34,22 @@ export default function OrganizationsScreen({ navigation }) {
             onPress={() => navigation.navigate('OrgDetail', { id: item.id })}
             activeOpacity={0.85}
         >
-            {item.logo
-                ? <Image source={{ uri: item.logo }} style={styles.orgLogo} />
-                : <View style={[styles.orgLogo, styles.orgLogoFallback]}>
-                    <Text style={styles.orgLogoText}>{item.name?.[0] ?? 'O'}</Text>
-                  </View>
-            }
-            <View style={styles.orgInfo}>
-                <Text style={styles.orgName} numberOfLines={2}>{item.name}</Text>
-                {item.mission ? (
-                    <Text style={styles.orgMission} numberOfLines={2}>{item.mission}</Text>
-                ) : null}
-                <TouchableOpacity onPress={() => navigation.navigate('OrgDetail', { id: item.id })}>
-                    <Text style={styles.viewDetails}>👁 View Details</Text>
-                </TouchableOpacity>
+            <View style={styles.orgLogoWrap}>
+                {item.logo
+                    ? <Image source={{ uri: item.logo }} style={styles.orgLogo} />
+                    : <View style={[styles.orgLogo, styles.orgLogoFallback]}>
+                        <Text style={styles.orgLogoText}>{item.name?.[0] ?? 'O'}</Text>
+                      </View>
+                }
             </View>
+            <Text style={styles.orgName} numberOfLines={2}>{item.name}</Text>
+            {item.president ? (
+                <Text style={styles.orgPresident} numberOfLines={1}>👤 {item.president}</Text>
+            ) : null}
+            {item.mission ? (
+                <Text style={styles.orgMission} numberOfLines={2}>{item.mission}</Text>
+            ) : null}
+            <Text style={styles.viewDetails}>👁 View Details</Text>
         </TouchableOpacity>
     );
 
@@ -107,6 +108,8 @@ export default function OrganizationsScreen({ navigation }) {
                     data={orgs}
                     keyExtractor={item => String(item.id)}
                     renderItem={renderOrg}
+                    numColumns={2}
+                    columnWrapperStyle={styles.row}
                     contentContainerStyle={styles.list}
                     showsVerticalScrollIndicator={false}
                     refreshControl={<RefreshControl refreshing={refreshing} onRefresh={() => { setRefreshing(true); loadOrgs(); }} />}
@@ -140,19 +143,22 @@ const styles = StyleSheet.create({
     filterChipActive: { backgroundColor: '#4A6CF7', borderColor: '#4A6CF7' },
     filterText: { fontSize: 13, color: '#555' },
     filterTextActive: { color: '#fff', fontWeight: '600' },
-    list: { paddingHorizontal: 16, paddingBottom: 30, gap: 12 },
+    list: { paddingHorizontal: 12, paddingBottom: 30 },
+    row: { justifyContent: 'space-between', marginBottom: 12, paddingHorizontal: 4 },
     orgCard: {
         backgroundColor: '#fff', borderRadius: 14,
-        flexDirection: 'row', alignItems: 'center', padding: 14,
+        alignItems: 'center', padding: 16,
+        flex: 1, marginHorizontal: 4,
         shadowColor: '#000', shadowOffset: { width: 0, height: 2 },
         shadowOpacity: 0.07, shadowRadius: 8, elevation: 3,
     },
-    orgLogo: { width: 60, height: 60, borderRadius: 30, marginRight: 14 },
+    orgLogoWrap: { marginBottom: 10 },
+    orgLogo: { width: 72, height: 72, borderRadius: 36 },
     orgLogoFallback: { backgroundColor: '#4A6CF7', alignItems: 'center', justifyContent: 'center' },
-    orgLogoText: { color: '#fff', fontSize: 24, fontWeight: '700' },
-    orgInfo: { flex: 1 },
-    orgName: { fontSize: 15, fontWeight: '700', color: '#1e2f6e', marginBottom: 4 },
-    orgMission: { fontSize: 12, color: '#666', lineHeight: 16, marginBottom: 6 },
+    orgLogoText: { color: '#fff', fontSize: 28, fontWeight: '700' },
+    orgName: { fontSize: 15, fontWeight: '700', color: '#1e2f6e', marginBottom: 4, textAlign: 'center' },
+    orgPresident: { fontSize: 12, color: '#4A6CF7', fontWeight: '600', marginBottom: 6, textAlign: 'center' },
+    orgMission: { fontSize: 12, color: '#666', lineHeight: 16, marginBottom: 8, textAlign: 'center' },
     viewDetails: { fontSize: 12, color: '#4A6CF7', fontWeight: '600' },
     empty: { textAlign: 'center', marginTop: 60, color: '#888', fontSize: 15 },
 });
