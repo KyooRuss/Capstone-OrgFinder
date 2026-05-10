@@ -16,7 +16,8 @@ class TrashController extends Controller
             ->withCount(['accessUsers as members_count', 'events as events_count']);
 
         if ($request->filled('search')) {
-            $query->where('name', 'like', '%' . $request->search . '%');
+            $query->where('last_name', 'like', '%' . $request->search . '%')
+                  ->orWhere('first_name', 'like', '%' . $request->search . '%');
         }
 
         $organizations = $query->latest('deleted_at')->get();
@@ -42,7 +43,8 @@ class TrashController extends Controller
         $query = User::onlyTrashed()->where('role', 'admin_officer');
 
         if ($request->filled('search')) {
-            $query->where('name', 'like', '%' . $request->search . '%');
+            $query->where('last_name', 'like', '%' . $request->search . '%')
+                  ->orWhere('first_name', 'like', '%' . $request->search . '%');
         }
 
         $officers = $query->latest('deleted_at')->get();
@@ -55,7 +57,8 @@ class TrashController extends Controller
         $query = User::onlyTrashed()->where('role', 'student');
 
         if ($request->filled('search')) {
-            $query->where('name', 'like', '%' . $request->search . '%');
+            $query->where('last_name', 'like', '%' . $request->search . '%')
+                  ->orWhere('first_name', 'like', '%' . $request->search . '%');
         }
 
         $students = $query->latest('deleted_at')->get();

@@ -16,7 +16,7 @@ export default function SplashScreen() {
         <View style={styles.container}>
             <Animated.View style={{ transform: [{ scale }], opacity }}>
                 <Image
-                    source={require('../../assets/icon.png')}
+                    source={require('../../assets/orgfinder-logo.png')}
                     style={styles.logo}
                     resizeMode="contain"
                 />

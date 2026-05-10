@@ -29,7 +29,7 @@ class EventApiController extends Controller
 
     public function show($id)
     {
-        $event = Event::with(['organization', 'gains'])->findOrFail($id);
+        $event = Event::with(['organization', 'benefits'])->findOrFail($id);
 
         return response()->json(['event' => $this->eventDetailResource($event)]);
     }
@@ -40,13 +40,12 @@ class EventApiController extends Controller
             'id'           => $event->id,
             'title'        => $event->title,
             'date'         => $event->date->format('D, M j, Y'),
-            'start_time'   => $event->start_time,
-            'end_time'     => $event->end_time,
-            'location'     => $event->location,
-            'poster'       => $event->poster ? asset('storage/' . $event->poster) : null,
+            'time'         => $event->time,
+            'venue'        => $event->venue,
+            'event_poster' => $event->event_poster ? asset('storage/' . $event->event_poster) : null,
             'organization' => [
                 'id'   => $event->organization->id,
-                'name' => $event->organization->name,
+                'org_name' => $event->organization->org_name,
             ],
         ];
     }
@@ -58,14 +57,13 @@ class EventApiController extends Controller
             'title'        => $event->title,
             'description'  => $event->description,
             'date'         => $event->date->format('D, M j, Y'),
-            'start_time'   => $event->start_time,
-            'end_time'     => $event->end_time,
-            'location'     => $event->location,
-            'poster'       => $event->poster ? asset('storage/' . $event->poster) : null,
-            'gains'        => $event->gains->pluck('gain')->values(),
+            'time'         => $event->time,
+            'venue'        => $event->venue,
+            'event_poster' => $event->event_poster ? asset('storage/' . $event->event_poster) : null,
+            'benefits'     => $event->benefits->pluck('benefit')->values(),
             'organization' => [
                 'id'       => $event->organization->id,
-                'name'     => $event->organization->name,
+                'org_name' => $event->organization->org_name,
                 'logo'     => $event->organization->logo
                     ? asset('storage/' . $event->organization->logo)
                     : null,

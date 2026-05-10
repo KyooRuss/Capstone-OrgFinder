@@ -13,7 +13,8 @@ class StudentController extends Controller
         $query = User::where('role', 'student');
 
         if ($request->filled('search')) {
-            $query->where('name', 'like', '%' . $request->search . '%');
+            $query->where('last_name', 'like', '%' . $request->search . '%')
+                  ->orWhere('first_name', 'like', '%' . $request->search . '%');
         }
 
         if ($request->filled('filter') && in_array($request->filter, ['active', 'blocked'])) {
@@ -24,7 +25,8 @@ class StudentController extends Controller
             return [
                 'id'             => $user->id,
                 'student_number' => $user->student_number ?? 'S' . str_pad($index + 1, 4, '0', STR_PAD_LEFT),
-                'name'           => $user->name,
+                'last_name'      => $user->last_name,
+                'first_name'      => $user->first_name,
                 'year_level'     => $user->year_level ?? '—',
                 'email'          => $user->email,
                 'status'         => $user->status,

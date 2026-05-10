@@ -1,7 +1,7 @@
 import React, { useState, useContext } from 'react';
 import {
     View, Text, TextInput, TouchableOpacity,
-    StyleSheet, ScrollView, ActivityIndicator, Alert,
+    StyleSheet, ScrollView, ActivityIndicator, Alert, 
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { AuthContext } from '../context/AuthContext';
@@ -9,34 +9,38 @@ import SelectionModal from '../components/SelectionModal';
 import api from '../api/client';
 
 const PROGRAMS = ['BSIT', 'BSCS', 'BSIS', 'BSCpE', 'BSCE', 'BSEE', 'BSME', 'BSN', 'BSBA', 'BSA'];
-const YEAR_LEVELS = ['1st Year', '2nd Year', '3rd Year', '4th Year', '5th Year'];
+const YEAR_LEVELS = ['1st', '2nd', '3rd', '4th', '5th'];
 
 const INTERESTS = [
-    'Technology', 'Programming', 'Networking', 'Arts',
-    'Gaming', 'Design', 'Animation', 'Cyber Security',
-    'Artificial Intelligence', 'Analytics', 'Machine Learning', 'Innovation',
+    'Technology', 'Programming',  'Arts', 'Networking', 'Leadership', 'Research', 'Dancing', 'Photography',
+    'Gaming', 'Sign Language', 'Photo Video Editing', 'Singing', 'Mental First Aid', 'Acting', 'Innovation',
+    'Recording Production', 'Music Publishing',
 ];
 const SKILLS = [
-    'Public Speaking', 'Leadership', 'Project Management', 'Arts',
-    'Programming', 'Cybersecurity', 'UI/UX Design', 'Graphic Design',
+    'Programming', 'Sign Language Fluency', 'Singing', 'Leadership', 'Voice Acting', 'Research Writing', 'Public Speaking', 
+    'Music Production', 'Stage Performance', 'Strategic Gaming', 'Event Planning', 'Dancing', 
 ];
-const ACTIVITIES = ['Training', 'Forum', 'Seminar', 'Competition', 'E-sports', 'Workshop'];
+const ACTIVITIES = [
+    'Competition', 'E-Sports Tournament', 'Training', 'Seminar', 'Peer Counseling', 'Public Speaking Event', 'Workshop', 
+    'Tech Talk', 'Theater Performance', 'Media Production', 'Forum',
+];
 
 export default function ProfileAssessmentScreen() {
     const { setUser, refreshUser } = useContext(AuthContext);
 
-    const [name, setName]           = useState('');
-    const [yearLevel, setYearLevel] = useState('');
-    const [program, setProgram]     = useState('');
-    const [interests, setInterests] = useState([]);
-    const [skills, setSkills]       = useState([]);
+    const [first_name, setFirstName]  = useState('');
+    const [last_name, setLastName]    = useState('');
+    const [yearLevel, setYearLevel]   = useState('');
+    const [program, setProgram]       = useState('');
+    const [interests, setInterests]   = useState([]);
+    const [skills, setSkills]         = useState([]);
     const [activities, setActivities] = useState([]);
-    const [loading, setLoading]     = useState(false);
+    const [loading, setLoading]       = useState(false);
 
     const [modal, setModal] = useState(null); // 'yearLevel' | 'program' | 'interests' | 'skills' | 'activities'
 
     const dropdowns = {
-        yearLevel: { label: yearLevel || 'Select year level', field: 'yearLevel' },
+        yearLevel: { label: yearLevel || '', field: 'yearLevel' },
         program: { label: program || 'Select program', field: 'program' },
         interests: { label: interests.length ? interests.join(', ') : 'Select interest or hobby', field: 'interests' },
         skills: { label: skills.length ? skills.join(', ') : 'Select skills to improve', field: 'skills' },
@@ -44,7 +48,7 @@ export default function ProfileAssessmentScreen() {
     };
 
     const handleSubmit = async () => {
-        if (!yearLevel || !program || !interests.length || !skills.length || !activities.length) {
+        if (!first_name || !last_name || !yearLevel || !program || !interests.length || !skills.length || !activities.length) {
             Alert.alert('Incomplete', 'Please fill in all fields.');
             return;
         }
@@ -52,6 +56,8 @@ export default function ProfileAssessmentScreen() {
         try {
             const yearNum = YEAR_LEVELS.indexOf(yearLevel) + 1;
             await api.post('/profile/complete', {
+                first_name,
+                last_name,
                 year_level: yearNum,
                 program,
                 interests,
@@ -93,24 +99,35 @@ export default function ProfileAssessmentScreen() {
             <ScrollView style={styles.scroll} contentContainerStyle={styles.form} keyboardShouldPersistTaps="handled">
                 <View style={styles.row}>
                     <View style={[styles.fieldWrap, { flex: 1 }]}>
-                        <Text style={styles.label}>Full Name</Text>
+                        <Text style={styles.label}>First Name</Text>
                         <TextInput
                             style={styles.textInput}
-                            placeholder="Enter your full name"
+                            placeholder="Your first name"
                             placeholderTextColor="#bbb"
-                            value={name}
-                            onChangeText={setName}
+                            value={first_name}
+                            onChangeText={setFirstName}
                         />
                     </View>
-                    <View style={{ flex: 1 }}>
-                        <Text style={styles.label}>Year Level</Text>
-                        {renderDropdown('yearLevel', 'Select year level')}
+                    <View style={[styles.fieldWrap, { flex: 1 }]}>
+                        <Text style={styles.label}>Last Name</Text>
+                        <TextInput
+                            style={styles.textInput}
+                            placeholder="Your last name"
+                            placeholderTextColor="#bbb"
+                            value={last_name}
+                            onChangeText={setLastName}
+                        />
                     </View>
                 </View>
-
-                <View style={styles.fieldWrap}>
-                    <Text style={styles.label}>Program</Text>
-                    {renderDropdown('program', 'Select program')}
+                <View style={styles.row}>
+                    <View style={[styles.fieldWrap, { flex: 1 }]}>
+                        <Text style={styles.label}>Program</Text>
+                        {renderDropdown('program', 'Select program')}
+                    </View>
+                    <View style={[styles.fieldWrap, { flex: 0.25 }]}>
+                        <Text style={styles.label}>Year Level</Text>
+                        {renderDropdown('yearLevel', '')}
+                    </View>
                 </View>
 
                 <View style={styles.fieldWrap}>

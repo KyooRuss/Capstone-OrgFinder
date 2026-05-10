@@ -16,7 +16,7 @@ class OrganizationController extends Controller
         $query = Organization::withCount(['accessUsers as members_count', 'events as events_count']);
 
         if ($request->filled('search')) {
-            $query->where('name', 'like', '%' . $request->search . '%');
+            $query->where('org_name', 'like', '%' . $request->search . '%');
         }
 
         $organizations = $query->latest()->get();
@@ -53,7 +53,7 @@ class OrganizationController extends Controller
         }
 
         $organization = Organization::create([
-            'name'             => $validated['name'],
+            'org_name'         => $validated['org_name'],
             'vision'           => $validated['vision'] ?? null,
             'mission'          => $validated['mission'] ?? null,
             'room_number'      => $validated['room_number'] ?? null,
@@ -95,7 +95,7 @@ class OrganizationController extends Controller
     public function update(Request $request, Organization $organization)
     {
         $validated = $request->validate([
-            'name'             => ['required', 'string', 'max:255'],
+            'org_name'         => ['required', 'string', 'max:255'],
             'vision'           => ['nullable', 'string'],
             'mission'          => ['nullable', 'string'],
             'room_number'      => ['nullable', 'string', 'max:100'],
@@ -117,7 +117,7 @@ class OrganizationController extends Controller
         }
 
         $organization->update([
-            'name'             => $validated['name'],
+            'org_name'         => $validated['org_name'],
             'vision'           => $validated['vision'] ?? null,
             'mission'          => $validated['mission'] ?? null,
             'room_number'      => $validated['room_number'] ?? null,
@@ -159,17 +159,18 @@ class OrganizationController extends Controller
     {
         $access = $organization->accessUsers()->with('user')->get()->map(function ($a) {
             return [
-                'id'       => $a->id,
-                'user_id'  => $a->user_id,
-                'name'     => $a->user->name,
-                'email'    => $a->user->email,
-                'position' => $a->position,
-                'avatar'   => $a->user->name,
+                'id'        => $a->id,
+                'user_id'   => $a->user_id,
+                'last_name' => $a->user->last_name,
+                'first_name'=> $a->user->first_name,
+                'email'     => $a->user->email,
+                'position'  => $a->position,
+                'avatar'    => $a->user->name,
             ];
         });
 
         return response()->json([
-            'organization' => $organization->name,
+            'org_name'     => $organization->org_name,
             'access'       => $access,
         ]);
     }
@@ -177,9 +178,10 @@ class OrganizationController extends Controller
     public function addAccess(Request $request, Organization $organization)
     {
         $validated = $request->validate([
-            'email'    => ['required', 'email', 'exists:users,email'],
-            'name'     => ['nullable', 'string'],
-            'position' => ['required', 'string', 'max:100'],
+            'email'      => ['required', 'email', 'exists:users,email'],
+            'last_name'  => ['nullable', 'string'],
+            'first_name' => ['nullable', 'string'],
+            'position'   => ['required', 'string', 'max:100'],
         ]);
 
         $user = User::where('email', $validated['email'])->firstOrFail();

@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
+use App\Models\UserProfile;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Storage;
 
@@ -11,6 +12,8 @@ class ProfileApiController extends Controller
     public function complete(Request $request)
     {
         $data = $request->validate([
+            'first_name'  => 'required|string|max:255',
+            'last_name'   => 'required|string|max:255',
             'year_level'  => 'required|integer|min:1|max:5',
             'program'     => 'required|string|max:100',
             'interests'   => 'required|array|min:1|max:3',
@@ -34,7 +37,8 @@ class ProfileApiController extends Controller
     public function update(Request $request)
     {
         $data = $request->validate([
-            'name'        => 'sometimes|string|max:255',
+            'first_name'  => 'sometimes|string|max:255',
+            'last_name'   => 'sometimes|string|max:255',
             'year_level'  => 'sometimes|integer|min:1|max:5',
             'program'     => 'sometimes|string|max:100',
             'interests'   => 'sometimes|array|min:1|max:3',
@@ -67,19 +71,20 @@ class ProfileApiController extends Controller
 
     private function userResource($user): array
     {
+        $profile = $user->profile;
         return [
             'id'                => $user->id,
-            'name'              => $user->name,
+            'first_name'        => $user->first_name,
+            'last_name'         => $user->last_name,
             'email'             => $user->email,
-            'student_number'    => $user->student_number,
-            'year_level'        => $user->year_level,
-            'program'           => $user->program,
-            'interests'         => $user->interests ?? [],
-            'skills'            => $user->skills ?? [],
-            'activities'        => $user->activities ?? [],
-            'profile_completed' => $user->profile_completed,
-            'profile_photo'     => $user->profile_photo
-                ? asset('storage/' . $user->profile_photo)
+            'year_level'        => $profile->year_level,
+            'program'           => $profile->program,
+            'interests'         => $profile->interest ?? [],
+            'skills'            => $profile->skill_to_improve ?? [],
+            'activities'        => $profile->preferred_activity ?? [],
+            'profile_completed' => $profile->profile_completed ?? false,
+            'profile_photo'     => $profile->profile_photo
+                ? asset('storage/' . $profile->profile_photo)
                 : null,
         ];
     }

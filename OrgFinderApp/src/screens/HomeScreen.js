@@ -13,7 +13,7 @@ export default function HomeScreen({ navigation }) {
     const [loading, setLoading]       = useState(true);
     const [refreshing, setRefreshing] = useState(false);
 
-    const firstName = user?.name?.split(' ')[0] ?? 'Student';
+    const firstName = user?.first_name?.split(' ')[0] ?? 'Student';
 
     const loadRecs = useCallback(async () => {
         try {

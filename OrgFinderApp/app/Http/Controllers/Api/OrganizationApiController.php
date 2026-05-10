@@ -14,14 +14,14 @@ class OrganizationApiController extends Controller
             ->whereNull('deleted_at');
 
         if ($search = $request->query('search')) {
-            $query->where('name', 'like', "%{$search}%");
+            $query->where('org_name', 'like', "%{$search}%");
         }
 
         if ($category = $request->query('category')) {
             $query->where('category', $category);
         }
 
-        $orgs = $query->orderBy('name')->get();
+        $orgs = $query->orderBy('org_name')->get();
 
         return response()->json(['organizations' => $orgs->map(fn($o) => $this->orgResource($o))]);
     }
@@ -42,7 +42,7 @@ class OrganizationApiController extends Controller
     {
         return [
             'id'       => $org->id,
-            'name'     => $org->name,
+            'org_name' => $org->org_name,
             'category' => $org->category,
             'president'=> $org->president,
             'mission'  => $org->mission,
@@ -54,7 +54,7 @@ class OrganizationApiController extends Controller
     {
         return [
             'id'               => $org->id,
-            'name'             => $org->name,
+            'org_name'         => $org->org_name,
             'category'         => $org->category,
             'president'        => $org->president,
             'vision'           => $org->vision,
@@ -70,8 +70,8 @@ class OrganizationApiController extends Controller
                 'id'       => $e->id,
                 'title'    => $e->title,
                 'date'     => $e->date->format('M j, Y'),
-                'location' => $e->location,
-                'poster'   => $e->poster ? asset('storage/' . $e->poster) : null,
+                'venue'     => $e->venue,
+                'event_poster' => $e->event_poster ? asset('storage/' . $e->event_poster) : null,
             ])->values(),
         ];
     }
