@@ -34,7 +34,7 @@
                 <div style="flex:1;min-width:0;">
                     <div style="font-size:16px;font-weight:700;color:#4361EE;margin-bottom:6px;">{{ $organization->name }}</div>
                     @if($organization->category)
-                        <div style="font-size:12px;color:#64748b;margin-bottom:8px;">{{ $organization->category }}</div>
+                        <div style="font-size:12px;color:#64748b;margin-bottom:8px;">{{ implode(', ', $organization->category) }}</div>
                     @endif
                     <p style="font-size:13px;color:#64748b;line-height:1.6;">{{ $organization->mission ?? '' }}</p>
                     <div style="display:flex;flex-wrap:wrap;gap:16px;margin-top:12px;">
