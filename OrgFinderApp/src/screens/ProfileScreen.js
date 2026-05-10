@@ -3,6 +3,7 @@ import {
     View, Text, TouchableOpacity, StyleSheet,
     ScrollView, Image, Alert, ActivityIndicator,
 } from 'react-native';
+import { LinearGradient } from 'expo-linear-gradient';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import * as ImagePicker from 'expo-image-picker';
 import AsyncStorage from '@react-native-async-storage/async-storage';
@@ -72,9 +73,10 @@ export default function ProfileScreen({ navigation }) {
     const infoTag = (items) => items?.length ? items.join(', ') : '—';
 
     return (
-        <ScrollView style={styles.root} contentContainerStyle={styles.scroll}>
+        <ScrollView style={styles.root}>
+        <LinearGradient colors={['#7CB9FF', '#4A6CF7']} start={{ x: 0, y: 0 }} end={{ x: 1, y: 1 }} style={styles.scroll}>
             {/* Back button */}
-            <SafeAreaView style={{ backgroundColor: '#4A6CF7' }}>
+            <SafeAreaView>
                 <TouchableOpacity style={styles.backBtn} onPress={() => navigation.goBack()}>
                     <Text style={styles.backIcon}>‹</Text>
                     <Text style={styles.backLabel}>Profile</Text>
@@ -85,7 +87,7 @@ export default function ProfileScreen({ navigation }) {
                     <Text style={styles.editIcon}>✎</Text>
                 </TouchableOpacity>
             </SafeAreaView>
-
+        
             {/* Profile card */}
             <View style={styles.card}>
                 {/* Avatar with upload overlay */}
@@ -121,6 +123,7 @@ export default function ProfileScreen({ navigation }) {
                     </View>
                 </View>
             </View>
+        </LinearGradient>
 
             {/* Info sections */}
             <View style={styles.infoSection}>
@@ -147,22 +150,21 @@ export default function ProfileScreen({ navigation }) {
             <TouchableOpacity style={styles.signOutBtn} onPress={handleLogout}>
                 <Text style={styles.signOutText}>Sign out</Text>
             </TouchableOpacity>
+        
         </ScrollView>
+
     );
 }
 
 const styles = StyleSheet.create({
     root: { flex: 1, backgroundColor: '#f5f6fa' },
-    scroll: { paddingBottom: 30 },
     backBtn: {
         flexDirection: 'row', alignItems: 'center',
         paddingHorizontal: 16,
-        backgroundColor: '#4A6CF7',
     },
     backIcon: { color: '#fff', fontSize: 28, lineHeight: 28, marginRight: 4 },
     backLabel: { color: '#fff', fontSize: 18, fontWeight: '600', marginLeft: '6' },
     card: {
-        backgroundColor: '#4A6CF7',
         alignItems: 'center',
         paddingBottom: 30,
         position: 'relative',

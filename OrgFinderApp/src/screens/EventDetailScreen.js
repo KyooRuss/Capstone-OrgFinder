@@ -1,12 +1,10 @@
 import React, { useState, useEffect } from 'react';
 import {
     View, Text, ScrollView, Image, StyleSheet,
-    TouchableOpacity, ActivityIndicator, Dimensions,
+    TouchableOpacity, ActivityIndicator,
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import api from '../api/client';
-
-const { width } = Dimensions.get('window');
 
 export default function EventDetailScreen({ route, navigation }) {
     const { id } = route.params;
@@ -21,46 +19,68 @@ export default function EventDetailScreen({ route, navigation }) {
     }, [id]);
 
     if (loading) return (
-        <View style={styles.center}><ActivityIndicator color="#4A6CF7" size="large" /></View>
+        <View style={styles.root}>
+            <View style={styles.backdrop} />
+            <View style={styles.sheet}>
+                <ActivityIndicator color="#4A6CF7" size="large" style={{ marginTop: 40 }} />
+            </View>
+        </View>
     );
+
     if (!event) return (
-        <View style={styles.center}><Text>Event not found.</Text></View>
+        <View style={styles.root}>
+            <TouchableOpacity style={styles.backdrop} onPress={() => navigation.goBack()} activeOpacity={1} />
+            <View style={styles.sheet}>
+                <View style={styles.dragHandle} />
+                <Text style={{ textAlign: 'center', color: '#888', marginTop: 40 }}>Event not found.</Text>
+            </View>
+        </View>
     );
 
     return (
         <View style={styles.root}>
-            {/* Poster / dark overlay */}
-            <View style={styles.posterWrap}>
-                {event.poster
-                    ? <Image source={{ uri: event.poster }} style={styles.poster} />
-                    : <View style={[styles.poster, styles.posterFallback]}>
-                        <Text style={styles.posterIcon}>📅</Text>
-                      </View>
-                }
-                <View style={styles.overlay} />
-                <SafeAreaView style={styles.headerSafe}>
+            {/* Dark backdrop — tap to go back */}
+            <TouchableOpacity style={styles.backdrop} onPress={() => navigation.goBack()} activeOpacity={1}>
+                <SafeAreaView>
                     <TouchableOpacity style={styles.backBtn} onPress={() => navigation.goBack()}>
                         <Text style={styles.backIcon}>‹</Text>
-                        <Text style={styles.backLabel}>Upcoming Events</Text>
+                        <Text style={styles.backLabel}>Back</Text>
                     </TouchableOpacity>
                 </SafeAreaView>
-            </View>
+            </TouchableOpacity>
 
-            {/* Content card */}
-            <ScrollView style={styles.scrollWrap} contentContainerStyle={styles.scroll} showsVerticalScrollIndicator={false}>
-                <View style={styles.card}>
+            {/* Bottom sheet card */}
+            <View style={styles.sheet}>
+                <View style={styles.dragHandle} />
+
+                <ScrollView
+                    showsVerticalScrollIndicator={false}
+                    contentContainerStyle={styles.sheetContent}
+                    nestedScrollEnabled
+                >
                     <Text style={styles.eventTitle}>{event.title}</Text>
 
-                    <View style={styles.metaRow}>
-                        <Text style={styles.metaText}>📅 {event.date}</Text>
-                    </View>
-                    <View style={styles.metaRow}>
-                        <Text style={styles.metaText}>🕐 {event.start_time} – {event.end_time}</Text>
-                    </View>
-                    <View style={styles.metaRow}>
-                        <Text style={styles.metaText}>📍 {event.location}</Text>
+                    {/* Meta */}
+                    <View style={styles.metaGroup}>
+                        <View style={styles.metaRow}>
+                            <Text style={styles.metaIcon}>📅</Text>
+                            <Text style={styles.metaText}>{event.date}</Text>
+                        </View>
+                        {event.time ? (
+                            <View style={styles.metaRow}>
+                                <Text style={styles.metaIcon}>🕐</Text>
+                                <Text style={styles.metaText}>{event.time}</Text>
+                            </View>
+                        ) : null}
+                        {event.venue ? (
+                            <View style={styles.metaRow}>
+                                <Text style={styles.metaIcon}>📍</Text>
+                                <Text style={styles.metaText}>{event.venue}</Text>
+                            </View>
+                        ) : null}
                     </View>
 
+                    {/* Organization */}
                     {event.organization && (
                         <TouchableOpacity
                             style={styles.orgRow}
@@ -73,73 +93,97 @@ export default function EventDetailScreen({ route, navigation }) {
                                   </View>
                             }
                             <Text style={styles.orgName}>{event.organization.name}</Text>
+                            <Text style={styles.orgArrow}>›</Text>
                         </TouchableOpacity>
                     )}
 
+                    {/* About */}
                     {event.description ? (
-                        <>
+                        <View style={styles.section}>
                             <Text style={styles.sectionLabel}>About This Event</Text>
                             <Text style={styles.bodyText}>{event.description}</Text>
-                        </>
+                        </View>
                     ) : null}
 
-                    {event.gains?.length > 0 ? (
-                        <>
+                    {/* Benefits */}
+                    {event.benefits?.length > 0 ? (
+                        <View style={styles.section}>
                             <Text style={styles.sectionLabel}>What you will gain</Text>
-                            {event.gains.map((g, i) => (
+                            {event.benefits.map((g, i) => (
                                 <View key={i} style={styles.gainRow}>
-                                    <Text style={styles.gainBullet}>•</Text>
+                                    <View style={styles.gainDot} />
                                     <Text style={styles.gainText}>{g}</Text>
                                 </View>
                             ))}
-                        </>
+                        </View>
                     ) : null}
-                </View>
-            </ScrollView>
+                </ScrollView>
+            </View>
         </View>
     );
 }
 
 const styles = StyleSheet.create({
-    root: { flex: 1, backgroundColor: '#1a1f3c' },
-    center: { flex: 1, alignItems: 'center', justifyContent: 'center', backgroundColor: '#f5f6fa' },
-    posterWrap: { height: 260, position: 'relative' },
-    poster: { width: '100%', height: '100%' },
-    posterFallback: { backgroundColor: '#2346D4', alignItems: 'center', justifyContent: 'center' },
-    posterIcon: { fontSize: 64 },
-    overlay: {
-        ...StyleSheet.absoluteFillObject,
-        backgroundColor: 'rgba(20,20,60,0.55)',
-    },
-    headerSafe: { position: 'absolute', top: 0, left: 0, right: 0 },
+    root: { flex: 1, backgroundColor: '#1e2235' },
+
+    // Dark top area
+    backdrop: { flex: 1 },
     backBtn: {
         flexDirection: 'row', alignItems: 'center',
-        paddingHorizontal: 16, paddingVertical: 12,
+        paddingHorizontal: 16, paddingTop: 8,
     },
     backIcon: { color: '#fff', fontSize: 28, lineHeight: 28, marginRight: 4 },
-    backLabel: { color: '#fff', fontSize: 16, fontWeight: '600' },
-    scrollWrap: { flex: 1 },
-    scroll: { paddingBottom: 40 },
-    card: {
-        backgroundColor: '#fff', borderTopLeftRadius: 24, borderTopRightRadius: 24,
-        padding: 24, minHeight: 400,
+    backLabel: { color: '#fff', fontSize: 15, fontWeight: '600' },
+
+    // White bottom sheet
+    sheet: {
+        backgroundColor: '#fff',
+        borderTopLeftRadius: 28,
+        borderTopRightRadius: 28,
+        maxHeight: '70%',
+        paddingBottom: 30,
     },
-    eventTitle: { fontSize: 20, fontWeight: '800', color: '#1e2f6e', marginBottom: 16, lineHeight: 26 },
-    metaRow: { flexDirection: 'row', alignItems: 'center', marginBottom: 6 },
-    metaText: { fontSize: 14, color: '#555' },
+    dragHandle: {
+        width: 44, height: 4, borderRadius: 2,
+        backgroundColor: '#d1d5db',
+        alignSelf: 'center', marginTop: 12, marginBottom: 4,
+    },
+    sheetContent: { paddingHorizontal: 22, paddingTop: 10, paddingBottom: 20 },
+
+    // Content
+    eventTitle: {
+        fontSize: 20, fontWeight: '800', color: '#0f2044',
+        marginBottom: 14, lineHeight: 28,
+    },
+    metaGroup: {
+        backgroundColor: '#f5f7ff', borderRadius: 12,
+        padding: 12, marginBottom: 14, gap: 6,
+    },
+    metaRow: { flexDirection: 'row', alignItems: 'center', gap: 10 },
+    metaIcon: { fontSize: 14 },
+    metaText: { fontSize: 13, color: '#334155', flex: 1 },
+
     orgRow: {
         flexDirection: 'row', alignItems: 'center', gap: 10,
-        marginTop: 14, marginBottom: 4,
-        paddingVertical: 10, paddingHorizontal: 14,
         backgroundColor: '#f0f4ff', borderRadius: 12,
+        paddingVertical: 10, paddingHorizontal: 14, marginBottom: 14,
     },
-    orgLogo: { width: 36, height: 36, borderRadius: 18 },
+    orgLogo: { width: 34, height: 34, borderRadius: 17 },
     orgLogoFallback: { backgroundColor: '#4A6CF7', alignItems: 'center', justifyContent: 'center' },
-    orgLogoText: { color: '#fff', fontSize: 14, fontWeight: '700' },
-    orgName: { fontSize: 14, fontWeight: '600', color: '#1e2f6e', flex: 1 },
-    sectionLabel: { fontSize: 15, fontWeight: '700', color: '#1e2f6e', marginTop: 20, marginBottom: 8 },
-    bodyText: { fontSize: 14, color: '#555', lineHeight: 22 },
-    gainRow: { flexDirection: 'row', alignItems: 'flex-start', marginBottom: 6, gap: 8 },
-    gainBullet: { fontSize: 16, color: '#4A6CF7', lineHeight: 22 },
-    gainText: { flex: 1, fontSize: 14, color: '#444', lineHeight: 22 },
+    orgLogoText: { color: '#fff', fontSize: 13, fontWeight: '700' },
+    orgName: { fontSize: 13, fontWeight: '600', color: '#1e2f6e', flex: 1 },
+    orgArrow: { color: '#4A6CF7', fontSize: 20, lineHeight: 24 },
+
+    section: { marginBottom: 14 },
+    sectionLabel: {
+        fontSize: 15, fontWeight: '700', color: '#0f2044',
+        marginBottom: 8,
+    },
+    bodyText: { fontSize: 13, color: '#555', lineHeight: 21 },
+    gainRow: { flexDirection: 'row', alignItems: 'flex-start', gap: 10, marginBottom: 6 },
+    gainDot: {
+        width: 7, height: 7, borderRadius: 4,
+        backgroundColor: '#4A6CF7', marginTop: 6, flexShrink: 0,
+    },
+    gainText: { flex: 1, fontSize: 13, color: '#444', lineHeight: 21 },
 });

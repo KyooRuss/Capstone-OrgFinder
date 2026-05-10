@@ -1,61 +1,74 @@
 import React, { useState, useEffect, useCallback } from 'react';
 import {
     View, Text, TextInput, TouchableOpacity, StyleSheet,
-    FlatList, Image, ActivityIndicator, RefreshControl,
+    FlatList, Image, ActivityIndicator, RefreshControl, Modal, ScrollView,
 } from 'react-native';
+import { LinearGradient } from 'expo-linear-gradient';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import api from '../api/client';
 
-const CATEGORIES = ['All', 'Technology', 'Arts', 'Leadership', 'Design', 'Gaming', 'Cybersecurity', 'E-sports'];
-
 export default function EventsScreen({ navigation }) {
-    const [events, setEvents]     = useState([]);
-    const [loading, setLoading]   = useState(true);
+    const [events, setEvents]         = useState([]);
+    const [orgs, setOrgs]             = useState([]);
+    const [loading, setLoading]       = useState(true);
     const [refreshing, setRefreshing] = useState(false);
-    const [search, setSearch]     = useState('');
-    const [category, setCategory] = useState('All');
+    const [search, setSearch]         = useState('');
+    const [selectedOrg, setSelectedOrg] = useState(null); // { id, name }
+    const [showOrgModal, setShowOrgModal] = useState(false);
+
+    // Fetch org list once for the filter dropdown
+    useEffect(() => {
+        api.get('/organizations').then(res => {
+            setOrgs(res.data.organizations.map(o => ({ id: o.id, name: o.name })));
+        }).catch(() => {});
+    }, []);
 
     const loadEvents = useCallback(async () => {
         try {
             const params = {};
             if (search.trim()) params.search = search.trim();
-            if (category !== 'All') params.category = category;
+            if (selectedOrg) params.org_id = selectedOrg.id;
             const res = await api.get('/events/upcoming', { params });
             setEvents(res.data.events);
         } catch {}
         finally { setLoading(false); setRefreshing(false); }
-    }, [search, category]);
+    }, [search, selectedOrg]);
 
-    useEffect(() => { setLoading(true); loadEvents(); }, [category]);
+    useEffect(() => { setLoading(true); loadEvents(); }, [selectedOrg]);
 
     const renderEvent = ({ item }) => (
         <TouchableOpacity
             style={styles.eventCard}
             onPress={() => navigation.navigate('EventDetail', { id: item.id })}
-            activeOpacity={0.85}
+            activeOpacity={0.88}
         >
             {item.poster
                 ? <Image source={{ uri: item.poster }} style={styles.poster} />
-                : <View style={[styles.poster, styles.posterFallback]}>
-                    <Text style={styles.posterIcon}>📅</Text>
-                  </View>
+                : <View style={styles.posterPlaceholder} />
             }
             <View style={styles.eventInfo}>
                 <Text style={styles.eventTitle} numberOfLines={2}>{item.title}</Text>
+                {item.organization?.name ? (
+                    <Text style={styles.orgLabel}>{item.organization.name}</Text>
+                ) : null}
                 <View style={styles.metaRow}>
-                    <Text style={styles.metaText}>📅 {item.date}</Text>
+                    <Text style={styles.metaIcon}>📅</Text>
+                    <Text style={styles.metaText}>{item.date}</Text>
                 </View>
-                <View style={styles.metaRow}>
-                    <Text style={styles.metaText}>🕐 {item.start_time} – {item.end_time}</Text>
-                </View>
-                <View style={styles.metaRow}>
-                    <Text style={styles.metaText}>📍 {item.location}</Text>
-                </View>
-                <TouchableOpacity
-                    style={styles.detailBtn}
-                    onPress={() => navigation.navigate('EventDetail', { id: item.id })}
-                >
-                    <Text style={styles.detailBtnText}>View Details</Text>
+                {item.time ? (
+                    <View style={styles.metaRow}>
+                        <Text style={styles.metaIcon}>🕐</Text>
+                        <Text style={styles.metaText}>{item.time}</Text>
+                    </View>
+                ) : null}
+                {item.venue ? (
+                    <View style={styles.metaRow}>
+                        <Text style={styles.metaIcon}>📍</Text>
+                        <Text style={styles.metaText}>{item.venue}</Text>
+                    </View>
+                ) : null}
+                <TouchableOpacity onPress={() => navigation.navigate('EventDetail', { id: item.id })}>
+                    <Text style={styles.viewDetailsLink}>View Details</Text>
                 </TouchableOpacity>
             </View>
         </TouchableOpacity>
@@ -63,7 +76,7 @@ export default function EventsScreen({ navigation }) {
 
     return (
         <View style={styles.root}>
-            <View style={styles.header}>
+            <LinearGradient colors={['#7CB9FF', '#4A6CF7']} start={{ x: 0, y: 0 }} end={{ x: 1, y: 1 }} style={styles.header}>
                 <SafeAreaView>
                     <View style={styles.headerRow}>
                         <TouchableOpacity onPress={() => navigation.goBack()} style={styles.backBtn}>
@@ -71,39 +84,56 @@ export default function EventsScreen({ navigation }) {
                         </TouchableOpacity>
                         <Text style={styles.headerTitle}>Upcoming Events</Text>
                     </View>
-                    <View style={styles.searchWrap}>
-                        <Text style={styles.searchIcon}>🔍</Text>
-                        <TextInput
-                            style={styles.searchInput}
-                            placeholder="Search Event..."
-                            placeholderTextColor="#aaa"
-                            value={search}
-                            onChangeText={setSearch}
-                            onSubmitEditing={() => { setLoading(true); loadEvents(); }}
-                            returnKeyType="search"
-                        />
+                    <View style={styles.searchRow}>
+                        <View style={styles.searchWrap}>
+                            <Text style={styles.searchIcon}>🔍</Text>
+                            <TextInput
+                                style={styles.searchInput}
+                                placeholder="Search Event..."
+                                placeholderTextColor="#aaa"
+                                value={search}
+                                onChangeText={setSearch}
+                                onSubmitEditing={() => { setLoading(true); loadEvents(); }}
+                                returnKeyType="search"
+                            />
+                        </View>
+                        <TouchableOpacity style={styles.filterBtn} onPress={() => setShowOrgModal(true)}>
+                            <Text style={styles.filterBtnText} numberOfLines={1}>
+                                {selectedOrg ? selectedOrg.name : 'Filter'} ▼
+                            </Text>
+                        </TouchableOpacity>
                     </View>
                 </SafeAreaView>
-            </View>
+            </LinearGradient>
 
-            {/* Category filter */}
-            <View style={styles.filterRow}>
-                <FlatList
-                    horizontal
-                    data={CATEGORIES}
-                    keyExtractor={i => i}
-                    showsHorizontalScrollIndicator={false}
-                    contentContainerStyle={{ paddingHorizontal: 16, gap: 8 }}
-                    renderItem={({ item }) => (
-                        <TouchableOpacity
-                            style={[styles.filterChip, item === category && styles.filterChipActive]}
-                            onPress={() => setCategory(item)}
-                        >
-                            <Text style={[styles.filterText, item === category && styles.filterTextActive]}>{item}</Text>
-                        </TouchableOpacity>
-                    )}
-                />
-            </View>
+            {/* Org filter modal */}
+            <Modal visible={showOrgModal} transparent animationType="fade" onRequestClose={() => setShowOrgModal(false)}>
+                <TouchableOpacity style={styles.modalOverlay} activeOpacity={1} onPress={() => setShowOrgModal(false)}>
+                    <View style={styles.modalBox}>
+                        <ScrollView nestedScrollEnabled showsVerticalScrollIndicator={false}>
+                            <TouchableOpacity
+                                style={[styles.modalItem, !selectedOrg && styles.modalItemActive]}
+                                onPress={() => { setSelectedOrg(null); setShowOrgModal(false); }}
+                            >
+                                <Text style={[styles.modalItemText, !selectedOrg && styles.modalItemTextActive]}>
+                                    All Organizations
+                                </Text>
+                            </TouchableOpacity>
+                            {orgs.map(org => (
+                                <TouchableOpacity
+                                    key={org.id}
+                                    style={[styles.modalItem, selectedOrg?.id === org.id && styles.modalItemActive]}
+                                    onPress={() => { setSelectedOrg(org); setShowOrgModal(false); }}
+                                >
+                                    <Text style={[styles.modalItemText, selectedOrg?.id === org.id && styles.modalItemTextActive]}>
+                                        {org.name}
+                                    </Text>
+                                </TouchableOpacity>
+                            ))}
+                        </ScrollView>
+                    </View>
+                </TouchableOpacity>
+            </Modal>
 
             {loading ? (
                 <ActivityIndicator style={{ marginTop: 60 }} color="#4A6CF7" size="large" />
@@ -114,7 +144,13 @@ export default function EventsScreen({ navigation }) {
                     renderItem={renderEvent}
                     contentContainerStyle={styles.list}
                     showsVerticalScrollIndicator={false}
-                    refreshControl={<RefreshControl refreshing={refreshing} onRefresh={() => { setRefreshing(true); loadEvents(); }} />}
+                    refreshControl={
+                        <RefreshControl
+                            refreshing={refreshing}
+                            onRefresh={() => { setRefreshing(true); loadEvents(); }}
+                            colors={['#4A6CF7']}
+                        />
+                    }
                     ListEmptyComponent={<Text style={styles.empty}>No upcoming events found.</Text>}
                 />
             )}
@@ -123,49 +159,62 @@ export default function EventsScreen({ navigation }) {
 }
 
 const styles = StyleSheet.create({
-    root: { flex: 1, backgroundColor: '#f5f6fa' },
-    header: { backgroundColor: '#4A6CF7', paddingHorizontal: 16, paddingBottom: 16 },
-    headerRow: { flexDirection: 'row', alignItems: 'center', paddingTop: 8, marginBottom: 12 },
+    root: { flex: 1, backgroundColor: '#e8eff7' },
+    header: { paddingHorizontal: 16 },
+    headerRow: { flexDirection: 'row', alignItems: 'center', paddingTop: 8, marginBottom: 40 },
     backBtn: { padding: 4, marginRight: 8 },
     backIcon: { color: '#fff', fontSize: 28, lineHeight: 28 },
     headerTitle: { color: '#fff', fontSize: 20, fontWeight: '700' },
+    searchRow: { flexDirection: 'row', alignItems: 'center', gap: 5 },
     searchWrap: {
-        flexDirection: 'row', alignItems: 'center',
+        flex: 1, flexDirection: 'row', alignItems: 'center',
         backgroundColor: '#fff', borderRadius: 12, paddingHorizontal: 14, height: 46,
     },
     searchIcon: { fontSize: 16, marginRight: 8 },
     searchInput: { flex: 1, fontSize: 14, color: '#333' },
-    filterRow: { paddingVertical: 12 },
-    filterChip: {
-        paddingHorizontal: 14, paddingVertical: 6,
-        borderRadius: 20, backgroundColor: '#fff',
-        borderWidth: 1, borderColor: '#e0e0e0',
+    filterBtn: {
+        backgroundColor: '#fff', borderRadius: 12, height: 46,
+        paddingHorizontal: 12, alignItems: 'center', justifyContent: 'center',
+        maxWidth: 110,
     },
-    filterChipActive: { backgroundColor: '#4A6CF7', borderColor: '#4A6CF7' },
-    filterText: { fontSize: 13, color: '#555' },
-    filterTextActive: { color: '#fff', fontWeight: '600' },
-    list: { paddingHorizontal: 16, paddingBottom: 30, gap: 14 },
+    filterBtnText: { fontSize: 12, fontWeight: '600', color: '#4A6CF7' },
+
+    // Org modal
+    modalOverlay: {
+        flex: 1, backgroundColor: 'rgba(0,0,0,0.35)',
+        justifyContent: 'flex-start', paddingTop: 120, paddingHorizontal: 16,
+        alignItems: 'flex-end',
+    },
+    modalBox: {
+        backgroundColor: '#fff', borderRadius: 14, overflow: 'hidden',
+        elevation: 10, minWidth: 220, maxHeight: 300,
+        shadowColor: '#000', shadowOffset: { width: 0, height: 4 },
+        shadowOpacity: 0.15, shadowRadius: 12,
+    },
+    modalItem: { paddingVertical: 13, paddingHorizontal: 18, borderBottomWidth: 1, borderBottomColor: '#f1f5f9' },
+    modalItemActive: { backgroundColor: '#eff6ff' },
+    modalItemText: { fontSize: 14, color: '#334155' },
+    modalItemTextActive: { color: '#4A6CF7', fontWeight: '700' },
+
+    // Cards
+    list: { padding: 16, gap: 16 },
     eventCard: {
-        backgroundColor: '#fff', borderRadius: 14,
-        shadowColor: '#000', shadowOffset: { width: 0, height: 2 },
-        shadowOpacity: 0.07, shadowRadius: 8, elevation: 3,
-        overflow: 'hidden',
+        backgroundColor: '#d6e4f0', borderRadius: 18, overflow: 'hidden',
+        elevation: 2, shadowColor: '#000', shadowOffset: { width: 0, height: 1 },
+        shadowOpacity: 0.08, shadowRadius: 6,
     },
-    poster: { width: '100%', height: 160 },
-    posterFallback: {
-        backgroundColor: '#e0e7ff',
-        alignItems: 'center', justifyContent: 'center',
-    },
-    posterIcon: { fontSize: 48 },
+    poster: { width: '100%', height: 190 },
+    posterPlaceholder: { width: '100%', height: 190, backgroundColor: '#f0f5fa' },
     eventInfo: { padding: 14 },
-    eventTitle: { fontSize: 16, fontWeight: '700', color: '#1e2f6e', marginBottom: 8 },
-    metaRow: { flexDirection: 'row', alignItems: 'center', marginBottom: 4 },
-    metaText: { fontSize: 13, color: '#555' },
-    detailBtn: {
-        alignSelf: 'flex-end', marginTop: 10,
-        backgroundColor: '#1e3a8a', borderRadius: 20,
-        paddingHorizontal: 16, paddingVertical: 8,
+    eventTitle: { fontSize: 15, fontWeight: '700', color: '#0f2044', marginBottom: 4 },
+    orgLabel: { fontSize: 12, color: '#4A6CF7', fontWeight: '600', marginBottom: 8 },
+    metaRow: { flexDirection: 'row', alignItems: 'center', gap: 8, marginBottom: 4 },
+    metaIcon: { fontSize: 13 },
+    metaText: { fontSize: 13, color: '#334155', flex: 1 },
+    viewDetailsLink: {
+        alignSelf: 'flex-end',
+        fontSize: 13, fontWeight: '700', color: '#4A6CF7',
+        textDecorationLine: 'underline',
     },
-    detailBtnText: { color: '#fff', fontSize: 13, fontWeight: '600' },
     empty: { textAlign: 'center', marginTop: 60, color: '#888', fontSize: 15 },
 });

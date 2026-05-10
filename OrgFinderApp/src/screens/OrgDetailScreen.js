@@ -43,7 +43,6 @@ export default function OrgDetailScreen({ route, navigation }) {
                     </TouchableOpacity>
                 </SafeAreaView>
                 
-                <View style={styles.heroSpacer} />
                 <View style={styles.heroContent}>
                     {org.logo
                         ? <Image source={{ uri: org.logo }} style={styles.heroLogo} />
@@ -75,7 +74,7 @@ export default function OrgDetailScreen({ route, navigation }) {
                         <Text style={styles.sectionTitle}>Why Join {org.name}?</Text>
                         {org.reasons.map((r, i) => (
                             <View key={i} style={styles.reasonRow}>
-                                <Text style={styles.reasonCheck}>✅</Text>
+                                <Text style={styles.reasonCheck}>✔</Text>
                                 <Text style={styles.reasonText}>{r}</Text>
                             </View>
                         ))}
@@ -86,7 +85,12 @@ export default function OrgDetailScreen({ route, navigation }) {
                 {org.photos?.length > 0 && (
                     <View style={styles.section}>
                         <Text style={styles.sectionTitle}>Events & Activities</Text>
-                        <ScrollView horizontal showsHorizontalScrollIndicator={false} style={styles.photosRow}>
+                        <ScrollView
+                            horizontal
+                            showsHorizontalScrollIndicator={false}
+                            nestedScrollEnabled
+                            contentContainerStyle={styles.photosRow}
+                        >
                             {org.photos.map((p, i) => (
                                 <Image key={i} source={{ uri: p }} style={styles.photo} />
                             ))}
@@ -152,7 +156,6 @@ const styles = StyleSheet.create({
     backBtn: { flexDirection: 'row', alignItems: 'center', paddingHorizontal: 18 },
     backIcon: { color: '#fff', fontSize: 28, lineHeight: 28, marginRight: 4 },
     backLabel: { color: '#fff', fontSize: 14, fontWeight: '600' },
-    heroSpacer: { height: 20 },
     heroContent: {
         flexDirection: 'row', alignItems: 'center',
         paddingHorizontal: 20, gap: 16,
@@ -169,8 +172,8 @@ const styles = StyleSheet.create({
     reasonRow: { flexDirection: 'row', alignItems: 'flex-start', marginBottom: 8, gap: 8 },
     reasonCheck: { fontSize: 14 },
     reasonText: { flex: 1, fontSize: 14, color: '#444', lineHeight: 20 },
-    photosRow: { marginHorizontal: -4 },
-    photo: { width: 140, height: 100, borderRadius: 10, marginHorizontal: 4 },
+    photosRow: { gap: 10, paddingHorizontal: 2 },
+    photo: { width: 180, height: 120, borderRadius: 10 },
     sectionHeaderBtn: { backgroundColor: '#4A6CF7', borderRadius: 8, padding: 10, marginBottom: 12, alignSelf: 'flex-start' },
     sectionTitleWhite: { color: '#fff', fontWeight: '700', fontSize: 14 },
     descText: { fontSize: 14, color: '#555', lineHeight: 22 },
