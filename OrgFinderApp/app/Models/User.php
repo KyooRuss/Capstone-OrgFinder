@@ -13,10 +13,7 @@ class User extends Authenticatable
     use HasApiTokens, HasFactory, Notifiable, SoftDeletes;
 
     protected $fillable = [
-        'name', 'email', 'password',
-        'role', 'student_number', 'year_level', 'status',
-        'program', 'interests', 'skills', 'activities',
-        'profile_completed', 'profile_photo',
+        'first_name', 'last_name', 'email', 'password', 'role',  'status',
     ];
 
     protected $hidden = ['password', 'remember_token'];
@@ -26,10 +23,6 @@ class User extends Authenticatable
         return [
             'email_verified_at' => 'datetime',
             'password' => 'hashed',
-            'interests' => 'array',
-            'skills' => 'array',
-            'activities' => 'array',
-            'profile_completed' => 'boolean',
         ];
     }
 
@@ -46,6 +39,10 @@ class User extends Authenticatable
     public function isStudent(): bool
     {
         return $this->role === 'student';
+    }
+    public function profile()
+    {
+    return $this->hasOne(UserProfile::class);
     }
 
     public function isActive(): bool

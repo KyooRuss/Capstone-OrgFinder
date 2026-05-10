@@ -12,7 +12,7 @@ class Event extends Model
 
     protected $fillable = [
         'organization_id', 'title', 'description', 'date',
-        'start_time', 'end_time', 'location', 'poster', 'status',
+        'time', 'venue', 'poster', 'status',
     ];
 
     protected $casts = [
@@ -26,6 +26,6 @@ class Event extends Model
 
     public function gains()
     {
-        return $this->hasMany(EventGain::class)->orderBy('order_index');
+        return $this->hasMany(EventBenefit::class)->orderBy('order_index');
     }
 }

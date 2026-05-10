@@ -4,14 +4,19 @@ import {
     FlatList, Image, ActivityIndicator, RefreshControl,
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
+import { LinearGradient } from 'expo-linear-gradient';
 import { AuthContext } from '../context/AuthContext';
 import api from '../api/client';
+
+const CHAR_HAPPY     = require('../../assets/character/happy.png');
+const CHAR_SURPRISED = require('../../assets/character/surprised.png');
 
 export default function HomeScreen({ navigation }) {
     const { user } = useContext(AuthContext);
     const [recs, setRecs]             = useState([]);
     const [loading, setLoading]       = useState(true);
     const [refreshing, setRefreshing] = useState(false);
+    const [latestEvent, setLatestEvent] = useState(null);
 
     const firstName = user?.first_name?.split(' ')[0] ?? 'Student';
 
@@ -55,9 +60,12 @@ export default function HomeScreen({ navigation }) {
 
                 {/* Info */}
                 <View style={styles.orgInfo}>
-                    <Text style={styles.orgName} numberOfLines={2}>{item.name}</Text>
+                    <Text style={styles.orgName} numberOfLines={2}>
+                        {item.organization?.org_name}</Text>
                     {item.category ? (
-                        <Text style={styles.categoryTag}>{item.category}</Text>
+                    <Text style={styles.categoryTag}>
+                        {Array.isArray(item.category) ? item.category.join(', ') : item.category}
+                    </Text>
                     ) : null}
                 </View>
 
@@ -90,15 +98,14 @@ export default function HomeScreen({ navigation }) {
         </TouchableOpacity>
     );
 
-    return (
+   return (
         <View style={styles.root}>
             {/* Header */}
-            <View style={styles.header}>
+            <LinearGradient colors={['#7CB9FF', '#4A6CF7']} start={{ x: 0, y: 0 }} end={{ x: 1, y: 1 }} style={styles.header}>
                 <SafeAreaView>
                     <View style={styles.headerRow}>
                         <View>
-                            <Text style={styles.greeting}>Hello, {firstName}! 👋</Text>
-                            <Text style={styles.subGreeting}>Find your perfect organization</Text>
+                            <Text style={styles.greeting}>Hello, {firstName}!</Text>
                         </View>
                         <TouchableOpacity
                             style={styles.avatarBtn}
@@ -108,26 +115,54 @@ export default function HomeScreen({ navigation }) {
                         </TouchableOpacity>
                     </View>
 
-                    {/* Quick actions */}
-                    <View style={styles.quickActions}>
-                        <TouchableOpacity style={styles.quickBtn} onPress={() => navigation.navigate('Events')}>
-                            <Text style={styles.quickIcon}>📅</Text>
-                            <Text style={styles.quickLabel}>Upcoming{'\n'}Events</Text>
-                        </TouchableOpacity>
-                        <View style={styles.divider} />
-                        <TouchableOpacity style={styles.quickBtn} onPress={() => navigation.navigate('Orgs')}>
-                            <Text style={styles.quickIcon}>🏛</Text>
-                            <Text style={styles.quickLabel}>Explore{'\n'}CICS Orgs</Text>
-                        </TouchableOpacity>
+                    {/* Mascot */}
+                    <View style={styles.mascotRow}>
+                        <Image
+                            source={latestEvent ? CHAR_SURPRISED : CHAR_HAPPY}
+                            style={styles.mascotImg}
+                            resizeMode="contain"
+                        />
+                        <View style={styles.bubble}>
+                            <View style={styles.bubbleTail} />
+                            {latestEvent ? (
+                                <>
+                                    <Text style={styles.bubbleText}>
+                                        {latestEvent.organization.name} posted an upcoming event!
+                                    </Text>
+                                    <TouchableOpacity onPress={() => navigation.navigate('EventDetail', { id: latestEvent.id })}>
+                                        <Text style={styles.bubbleLink}>View details</Text>
+                                    </TouchableOpacity>
+                                </>
+                            ) : (
+                                <View>
+                                    <Text style={styles.characterName}>Hami</Text>
+                                    <Text style={styles.bubbleText}>Welcome! What are we exploring today?</Text>
+                                </View>
+                            )}
+                        </View>
                     </View>
+
                 </SafeAreaView>
+            </LinearGradient>
+
+            {/* Quick actions — floating card between header and body */}
+            <View style={styles.quickActions}>
+                <TouchableOpacity style={styles.quickBtn} onPress={() => navigation.navigate('Events')}>
+                    <Text style={styles.quickIcon}>📅</Text>
+                    <Text style={styles.quickLabel}>Upcoming{'\n'}Events</Text>
+                </TouchableOpacity>
+                <View style={styles.divider} />
+                <TouchableOpacity style={styles.quickBtn} onPress={() => navigation.navigate('Orgs')}>
+                    <Text style={styles.quickIcon}>🏛</Text>
+                    <Text style={styles.quickLabel}>Explore{'\n'}Organizations</Text>
+                </TouchableOpacity>
             </View>
 
             {/* Recommendations */}
             <View style={styles.body}>
                 <View style={styles.recHeader}>
-                    <Text style={styles.recTitle}>Recommended for You</Text>
-                    <Text style={styles.recSub}>Based on your interests & skills</Text>
+                    <Text style={styles.recTitle}>Recommended Orgs</Text>
+                    <Text style={styles.recSub}>Based on your interests & hobbies</Text>
                 </View>
 
                 {loading ? (
@@ -165,11 +200,10 @@ export default function HomeScreen({ navigation }) {
 
 const styles = StyleSheet.create({
     root: { flex: 1, backgroundColor: '#f0f2ff' },
-
-    // Header
-    header: { backgroundColor: '#4A6CF7', paddingHorizontal: 20, paddingBottom: 24 },
+     // Header
+    header: { paddingHorizontal: 20, paddingBottom: 10 },
     headerRow: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', paddingTop: 10 },
-    greeting: { fontSize: 22, fontWeight: '800', color: '#fff' },
+    greeting: { fontSize: 22, fontWeight: '600', color: '#fff' },
     subGreeting: { fontSize: 13, color: 'rgba(255,255,255,0.75)', marginTop: 2 },
     avatarBtn: {
         width: 40, height: 40, borderRadius: 20,
@@ -179,14 +213,69 @@ const styles = StyleSheet.create({
     avatarText: { color: '#fff', fontWeight: '700', fontSize: 16 },
     quickActions: {
         flexDirection: 'row',
-        backgroundColor: 'rgba(255,255,255,0.15)',
-        borderRadius: 16, marginTop: 16,
-        paddingVertical: 14, paddingHorizontal: 20,
+        backgroundColor: '#fff',
+        borderRadius: 18,
+        marginHorizontal: 20,
+        marginTop: -20,
+        paddingVertical: 16,
+        paddingHorizontal: 20,
+        shadowColor: '#4A6CF7',
+        shadowOffset: { width: 0, height: 6 },
+        shadowOpacity: 0.12,
+        shadowRadius: 14,
+        elevation: 8,
+        zIndex: 10,
     },
     quickBtn: { flex: 1, flexDirection: 'row', alignItems: 'center', gap: 10 },
     quickIcon: { fontSize: 22 },
-    quickLabel: { color: '#fff', fontSize: 13, fontWeight: '600', lineHeight: 18 },
-    divider: { width: 1, backgroundColor: 'rgba(255,255,255,0.3)', marginHorizontal: 16 },
+    quickLabel: { color: '#1e2f6e', fontSize: 13, fontWeight: '600', lineHeight: 18 },
+    divider: { width: 1, backgroundColor: '#e8e8e8', marginHorizontal: 16 },
+
+    // Character
+    mascotRow: {
+        flexDirection: 'row',
+        alignItems: 'center',
+        marginTop: 10,
+        marginBottom: 4,
+    },
+    mascotImg: { width: 130, height: 130 },
+    bubble: {
+        flex: 1,
+        backgroundColor: 'rgba(255,255,255,0.2)',
+        borderRadius: 12,
+        padding: 10,
+        marginLeft: -5,
+    },
+    bubbleTail: {
+        position: 'absolute',
+        left: -8,
+        top: 14,
+        borderTopWidth: 7,
+        borderBottomWidth: 7,
+        borderRightWidth: 8,
+        borderTopColor: 'transparent',
+        borderBottomColor: 'transparent',
+        borderRightColor: 'rgba(255,255,255,0.2)',
+    },
+    characterName: {
+        fontSize: 11,
+        color: '#C2F2FF',
+        fontWeight: '800',
+        lineHeight: 20,
+    },
+    bubbleText: {
+        fontSize: 14,
+        color: '#fff',
+        fontWeight: '500',
+        lineHeight: 19,
+    },
+    bubbleLink: {
+        fontSize: 12,
+        color: '#fff',
+        fontWeight: '700',
+        marginTop: 6,
+        textDecorationLine: 'underline',
+    },
 
     // Body
     body: { flex: 1 },
