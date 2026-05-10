@@ -53,7 +53,7 @@
                 </a>
                 <a href="{{ route('super-admin.events.past') }}"
                    class="nav-item nav-sub {{ request()->routeIs('super-admin.events.past') ? 'active' : '' }}">
-                    Past Events
+                    Event History
                 </a>
             </div>
         </div>

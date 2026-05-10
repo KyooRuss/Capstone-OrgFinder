@@ -60,4 +60,5 @@ class Organization extends Model
     {
         return $this->events()->count();
     }
+    
 }

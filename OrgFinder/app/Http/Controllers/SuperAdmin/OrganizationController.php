@@ -183,11 +183,9 @@ class OrganizationController extends Controller
             return [
                 'id'       => $a->id,
                 'user_id'  => $a->user_id,
-                'last_name'=> $a->user->last_name,
-                'first_name'=> $a->user->first_name,
+                'name'     => $a->user->name,
                 'email'    => $a->user->email,
                 'position' => $a->position,
-                'avatar'   => $a->user->name,
             ];
         });
 

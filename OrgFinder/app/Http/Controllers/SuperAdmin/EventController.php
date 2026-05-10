@@ -33,13 +33,13 @@ class EventController extends Controller
     public function past(Request $request)
     {
         $query = Event::with('organization')
-            ->where('date', '<', now()->toDateString());
+            ->whereIn('status', ['approved', 'rejected']);
 
         if ($request->filled('search')) {
             $query->where('title', 'like', '%' . $request->search . '%');
         }
 
-        $events = $query->orderByDesc('date')->get();
+        $events = $query->orderByDesc('updated_at')->get();
 
         return view('super-admin.events.past', compact('events'));
     }

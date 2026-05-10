@@ -1,13 +1,13 @@
 @extends('super-admin.layouts.app')
 
-@section('title', 'Past Events')
-@section('page-title', 'Past Events')
-@section('page-subtitle', 'View all completed events')
+@section('title', 'Event History')
+@section('page-title', 'Event History')
+@section('page-subtitle', 'All approved and rejected events')
 
 @section('content')
 <div class="card">
     <div class="toolbar">
-        <div class="toolbar-left">Total Past Events: {{ $events->count() }}</div>
+        <div class="toolbar-left">Total Events: {{ $events->count() }}</div>
         <form method="GET" style="display:flex;gap:8px;align-items:center;">
             <div class="search-box">
                 <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#94a3b8" stroke-width="2"><circle cx="11" cy="11" r="6"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
@@ -35,21 +35,18 @@
                     <td>{{ $event->organization->org_name }}</td>
                     <td>{{ $event->title }}</td>
                     <td>{{ $event->date->format('m-d-Y') }}</td>
-                    <td>{{ date('g:i A', strtotime($event->start_time)) }}</td>
-                    <td>{{ $event->venue }}</td>
+                    <td>{{ $event->time ? date('g:i A', strtotime($event->time)) : '—' }}</td>
+                    <td>{{ $event->venue ?? '—' }}</td>
                     <td>
                         <span class="badge badge-{{ $event->status }}">{{ ucfirst($event->status) }}</span>
                     </td>
-                    <td style="text-align:center;display:flex;gap:6px;justify-content:center;align-items:center;">
+                    <td style="text-align:center">
                         <button class="btn btn-primary btn-sm" onclick="viewEvent({{ $event->id }})">View Details</button>
-                        <button class="icon-btn" onclick="confirmDeleteEvent({{ $event->id }}, '{{ addslashes($event->title) }}')">
-                            <svg viewBox="0 0 24 24" fill="#ef4444" width="18" height="18"><path d="M6 19c0 1.1.9 2 2 2h8c1.1 0 2-.9 2-2V7H6v12zM19 4h-3.5l-1-1h-5l-1 1H5v2h14V4z"/></svg>
-                        </button>
                     </td>
                 </tr>
                 @empty
                 <tr>
-                    <td colspan="6" style="text-align:center;color:#94a3b8;padding:40px;">No past events found.</td>
+                    <td colspan="7" style="text-align:center;color:#94a3b8;padding:40px;">No event history found.</td>
                 </tr>
                 @endforelse
             </tbody>
@@ -62,7 +59,7 @@
     <div class="modal" style="max-width:600px;">
         <button class="modal-close" onclick="closeModal('eventModal')">×</button>
         <div style="display:flex;gap:20px;">
-            <div style="width:160px;min-height:200px;background:#e2e8f0;border-radius:10px;flex-shrink:0;overflow:hidden;">
+            <div id="eventPosterWrap" style="width:160px;min-height:200px;background:#e2e8f0;border-radius:10px;flex-shrink:0;overflow:hidden;">
                 <img id="eventPoster" src="" style="width:100%;height:100%;object-fit:cover;display:none;">
             </div>
             <div style="flex:1;">
@@ -85,18 +82,6 @@
         </div>
     </div>
 </div>
-
-{{-- Delete Confirm --}}
-<div class="modal-overlay" id="deleteEventModal">
-    <div class="modal" style="max-width:380px;text-align:center;">
-        <div class="modal-icon">⚠️</div>
-        <div class="modal-body">Delete <strong id="deleteEventName"></strong>?</div>
-        <div class="modal-actions">
-            <button class="btn btn-outline" onclick="closeModal('deleteEventModal')">Cancel</button>
-            <button class="btn btn-danger" id="confirmDeleteEventBtn">Delete</button>
-        </div>
-    </div>
-</div>
 @endsection
 
 @push('scripts')
@@ -107,30 +92,21 @@ function viewEvent(id) {
     .then(e => {
         document.getElementById('eventTitle').textContent = `${e.title} (${e.organization})`;
         document.getElementById('eventDate').textContent = '📅 ' + e.date;
-        document.getElementById('eventTime').textContent = '🕐 ' + e.start_time + (e.end_time ? ' – ' + e.end_time : '');
-        document.getElementById('eventLocation').textContent = '📍 ' + (e.location || 'TBA');
+        document.getElementById('eventTime').textContent = '🕐 ' + (e.time || 'TBA');
+        document.getElementById('eventLocation').textContent = '📍 ' + (e.venue || 'TBA');
         document.getElementById('eventDesc').textContent = e.description || '';
-        document.getElementById('eventGains').innerHTML = (e.gains || []).map(g => `<li>${g}</li>`).join('');
+        document.getElementById('eventGains').innerHTML = (e.benefits || []).map(g => `<li>${g}</li>`).join('');
+
         const poster = document.getElementById('eventPoster');
         if (e.poster) { poster.src = e.poster; poster.style.display = 'block'; }
+        else { poster.style.display = 'none'; }
+
         const badge = document.getElementById('eventStatusBadge');
-        const colors = { approved:'badge-approved', rejected:'badge-rejected', pending:'badge-pending' };
-        badge.innerHTML = `<span class="badge ${colors[e.status]}">${e.status.charAt(0).toUpperCase()+e.status.slice(1)}</span>`;
+        const colors = { approved: 'badge-approved', rejected: 'badge-rejected', pending: 'badge-pending' };
+        badge.innerHTML = `<span class="badge ${colors[e.status]}">${e.status.charAt(0).toUpperCase() + e.status.slice(1)}</span>`;
+
         openModal('eventModal');
     });
 }
-
-let deleteEventId = null;
-function confirmDeleteEvent(id, name) {
-    deleteEventId = id;
-    document.getElementById('deleteEventName').textContent = `"${name}"`;
-    openModal('deleteEventModal');
-}
-document.getElementById('confirmDeleteEventBtn').addEventListener('click', function() {
-    fetch(`/super-admin/events/${deleteEventId}`, {
-        method: 'DELETE',
-        headers: { 'X-CSRF-TOKEN': csrfToken(), 'Accept': 'application/json' }
-    }).then(() => location.reload());
-});
 </script>
 @endpush

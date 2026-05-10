@@ -35,6 +35,7 @@
                     <th>Event Title</th>
                     <th>Date</th>
                     <th>Time</th>
+                    <th>Venue</th>
                     <th>Status</th>
                     <th style="text-align:center">Action</th>
                 </tr>
@@ -46,6 +47,7 @@
                     <td>{{ $event->title }}</td>
                     <td>{{ $event->date->format('m-d-Y') }}</td>
                     <td>{{ date('g:i A', strtotime($event->time)) }}</td>
+                    <td>{{ $event->venue }}</td>
                     <td>
                         <span class="badge badge-{{ $event->status }}">
                             {{ ucfirst($event->status) }}
