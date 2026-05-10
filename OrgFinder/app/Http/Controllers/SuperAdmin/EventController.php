@@ -11,14 +11,14 @@ class EventController extends Controller
     public function upcoming(Request $request)
     {
         $query = Event::with('organization')
-            ->whereIn('status', ['pending', 'approved', 'rejected'])
+            ->whereIn('status', ['pending', 'approved'])
             ->where('date', '>=', now()->toDateString());
 
         if ($request->filled('search')) {
             $query->where('title', 'like', '%' . $request->search . '%');
         }
 
-        if ($request->filled('filter') && in_array($request->filter, ['pending', 'approved', 'rejected'])) {
+        if ($request->filled('filter') && in_array($request->filter, ['pending', 'approved'])) {
             $query->where('status', $request->filter);
         }
 
@@ -33,7 +33,13 @@ class EventController extends Controller
     public function past(Request $request)
     {
         $query = Event::with('organization')
-            ->whereIn('status', ['approved', 'rejected']);
+            ->where(function ($q) {
+                $q->where('status', 'rejected')
+                  ->orWhere(function ($q2) {
+                      $q2->where('status', 'approved')
+                         ->where('date', '<', now()->toDateString());
+                  });
+            });
 
         if ($request->filled('search')) {
             $query->where('title', 'like', '%' . $request->search . '%');

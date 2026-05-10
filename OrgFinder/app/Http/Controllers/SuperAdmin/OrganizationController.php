@@ -179,15 +179,15 @@ class OrganizationController extends Controller
 
     public function getAccess(Organization $organization)
     {
-        $access = $organization->accessUsers()->with('user')->get()->map(function ($a) {
-            return [
+        $access = $organization->accessUsers()->with('user')->get()
+            ->filter(fn($a) => $a->user !== null)
+            ->map(fn($a) => [
                 'id'       => $a->id,
                 'user_id'  => $a->user_id,
                 'name'     => $a->user->name,
                 'email'    => $a->user->email,
                 'position' => $a->position,
-            ];
-        });
+            ])->values();
 
         return response()->json([
             'organization' => $organization->org_name,

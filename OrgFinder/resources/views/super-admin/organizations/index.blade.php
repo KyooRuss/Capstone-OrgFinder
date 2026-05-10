@@ -175,26 +175,32 @@ function loadAccess(orgId, orgName) {
     fetch(`/super-admin/organizations/${orgId}/access`, {
         headers: { 'Accept': 'application/json' }
     })
-    .then(r => r.json())
+    .then(r => {
+        if (!r.ok) throw new Error('Server error: ' + r.status);
+        return r.json();
+    })
     .then(data => {
         const list = document.getElementById('accessList');
-        if (!data.access.length) {
+        if (!data.access || !data.access.length) {
             list.innerHTML = '<li style="color:#94a3b8;padding:10px 0;text-align:center;">No users have access yet.</li>';
             return;
         }
         list.innerHTML = data.access.map(a => `
             <li class="access-item">
-                <div class="access-avatar">${a.name.charAt(0).toUpperCase()}</div>
+                <div class="access-avatar">${a.name ? a.name.charAt(0).toUpperCase() : '?'}</div>
                 <div class="access-info">
-                    <div class="aname">${a.name}</div>
-                    <div class="aemail">${a.email}</div>
+                    <div class="aname">${a.name || ''}</div>
+                    <div class="aemail">${a.email || ''}</div>
                 </div>
-                <div class="access-pos">${a.position}</div>
-                <button class="icon-btn" onclick="promptRemoveAccess(${a.id}, '${a.name}')">
+                <div class="access-pos">${a.position || ''}</div>
+                <button class="icon-btn" onclick="promptRemoveAccess(${a.id}, '${(a.name || '').replace(/'/g, "\\'")}')">
                     <svg viewBox="0 0 24 24" fill="#ef4444" width="18" height="18"><path d="M6 19c0 1.1.9 2 2 2h8c1.1 0 2-.9 2-2V7H6v12zM19 4h-3.5l-1-1h-5l-1 1H5v2h14V4z"/></svg>
                 </button>
             </li>
         `).join('');
+    })
+    .catch(() => {
+        document.getElementById('accessList').innerHTML = '<li style="color:#ef4444;padding:10px 0;text-align:center;">Failed to load access list.</li>';
     });
 }
 

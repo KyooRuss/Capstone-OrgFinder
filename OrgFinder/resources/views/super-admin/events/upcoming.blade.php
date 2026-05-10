@@ -21,7 +21,6 @@
                     <a href="{{ request()->fullUrlWithQuery(['filter' => '']) }}">All</a>
                     <a href="{{ request()->fullUrlWithQuery(['filter' => 'pending']) }}">Pending</a>
                     <a href="{{ request()->fullUrlWithQuery(['filter' => 'approved']) }}">Approved</a>
-                    <a href="{{ request()->fullUrlWithQuery(['filter' => 'rejected']) }}">Rejected</a>
                 </div>
             </div>
         </form>
