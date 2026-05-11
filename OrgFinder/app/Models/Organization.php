@@ -13,12 +13,13 @@ class Organization extends Model
     protected $fillable = [
         'org_name', 'category', 'president', 'vision', 'mission',
         'room_number', 'contact_telegram', 'contact_facebook', 'logo',
-        'eligible_programs',
+        'eligible_programs', 'is_recruiting',
     ];
 
     protected $casts = [
         'eligible_programs' => 'array',
         'category'          => 'array',
+        'is_recruiting'     => 'boolean',
     ];
 
     public function photos()
@@ -49,6 +50,11 @@ class Organization extends Model
     public function events()
     {
         return $this->hasMany(Event::class);
+    }
+
+    public function membershipRequests()
+    {
+        return $this->hasMany(MembershipRequest::class);
     }
 
     public function getMembersCountAttribute(): int

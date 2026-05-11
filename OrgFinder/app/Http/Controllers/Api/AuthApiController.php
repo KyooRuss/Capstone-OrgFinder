@@ -64,6 +64,7 @@ class AuthApiController extends Controller
             'first_name'        => $user->first_name,
             'last_name'         => $user->last_name,
             'email'             => $user->email,
+            'student_number'    => $user->student_number,
             'year_level'        => $profile?->year_level,
             'program'           => $profile?->program,
             'interests'         => $profile?->interest ?? [],

@@ -2,14 +2,19 @@ import React, { useState, useEffect } from 'react';
 import {
     View, Text, ScrollView, Image, StyleSheet,
     TouchableOpacity, ActivityIndicator,
+    useWindowDimensions,
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
+import { Ionicons } from '@expo/vector-icons';
 import api from '../api/client';
 
 export default function EventDetailScreen({ route, navigation }) {
     const { id } = route.params;
+    const { height } = useWindowDimensions();
     const [event, setEvent]     = useState(null);
     const [loading, setLoading] = useState(true);
+
+    const sheetMaxHeight = Math.round(height * 0.68);
 
     useEffect(() => {
         api.get(`/events/${id}`)
@@ -21,7 +26,7 @@ export default function EventDetailScreen({ route, navigation }) {
     if (loading) return (
         <View style={styles.root}>
             <View style={styles.backdrop} />
-            <View style={styles.sheet}>
+            <View style={[styles.sheet, { maxHeight: sheetMaxHeight }]}>
                 <ActivityIndicator color="#4A6CF7" size="large" style={{ marginTop: 40 }} />
             </View>
         </View>
@@ -30,7 +35,7 @@ export default function EventDetailScreen({ route, navigation }) {
     if (!event) return (
         <View style={styles.root}>
             <TouchableOpacity style={styles.backdrop} onPress={() => navigation.goBack()} activeOpacity={1} />
-            <View style={styles.sheet}>
+            <View style={[styles.sheet, { maxHeight: sheetMaxHeight }]}>
                 <View style={styles.dragHandle} />
                 <Text style={{ textAlign: 'center', color: '#888', marginTop: 40 }}>Event not found.</Text>
             </View>
@@ -50,7 +55,7 @@ export default function EventDetailScreen({ route, navigation }) {
             </TouchableOpacity>
 
             {/* Bottom sheet card */}
-            <View style={styles.sheet}>
+            <View style={[styles.sheet, { maxHeight: sheetMaxHeight }]}>
                 <View style={styles.dragHandle} />
 
                 <ScrollView
@@ -63,18 +68,18 @@ export default function EventDetailScreen({ route, navigation }) {
                     {/* Meta */}
                     <View style={styles.metaGroup}>
                         <View style={styles.metaRow}>
-                            <Text style={styles.metaIcon}>📅</Text>
+                            <Ionicons name="calendar-outline" size={15} color="#000000" />
                             <Text style={styles.metaText}>{event.date}</Text>
                         </View>
                         {event.time ? (
                             <View style={styles.metaRow}>
-                                <Text style={styles.metaIcon}>🕐</Text>
+                                <Ionicons name="time-outline" size={15} color="#000000" />
                                 <Text style={styles.metaText}>{event.time}</Text>
                             </View>
                         ) : null}
                         {event.venue ? (
                             <View style={styles.metaRow}>
-                                <Text style={styles.metaIcon}>📍</Text>
+                                <Ionicons name="location-outline" size={15} color="#000000" />
                                 <Text style={styles.metaText}>{event.venue}</Text>
                             </View>
                         ) : null}
@@ -140,7 +145,6 @@ const styles = StyleSheet.create({
         backgroundColor: '#fff',
         borderTopLeftRadius: 28,
         borderTopRightRadius: 28,
-        maxHeight: '70%',
         paddingBottom: 30,
     },
     dragHandle: {
@@ -160,7 +164,6 @@ const styles = StyleSheet.create({
         padding: 12, marginBottom: 14, gap: 6,
     },
     metaRow: { flexDirection: 'row', alignItems: 'center', gap: 10 },
-    metaIcon: { fontSize: 14 },
     metaText: { fontSize: 13, color: '#334155', flex: 1 },
 
     orgRow: {

@@ -2,9 +2,11 @@ import React, { useState, useEffect, useContext, useCallback } from 'react';
 import {
     View, Text, TouchableOpacity, StyleSheet,
     FlatList, Image, ActivityIndicator, RefreshControl,
+    useWindowDimensions,
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { LinearGradient } from 'expo-linear-gradient';
+import { Ionicons } from '@expo/vector-icons';
 import { AuthContext } from '../context/AuthContext';
 import api from '../api/client';
 
@@ -17,6 +19,9 @@ export default function HomeScreen({ navigation }) {
     const [loading, setLoading]       = useState(true);
     const [refreshing, setRefreshing] = useState(false);
     const [latestEvent, setLatestEvent] = useState(null);
+
+    const { width } = useWindowDimensions();
+    const mascotSize = Math.min(Math.round(width * 0.35), 140);
 
     const firstName = user?.first_name?.split(' ')[0] ?? 'Student';
 
@@ -80,7 +85,14 @@ export default function HomeScreen({ navigation }) {
    return (
         <View style={styles.root}>
             {/* Header */}
-            <LinearGradient colors={['#7CB9FF', '#4A6CF7']} start={{ x: 0, y: 0 }} end={{ x: 1, y: 1 }} style={styles.header}>
+            <View style={styles.header}>
+                {/* Gradient background — change height here independently */}
+                <LinearGradient
+                    colors={['#7CB9FF', '#4A6CF7']}
+                    start={{ x: 0, y: 0 }}
+                    end={{ x: 1, y: 1 }}
+                    style={styles.headerGradient}
+                />
                 <SafeAreaView>
                     <View style={styles.headerRow}>
                         <View>
@@ -98,7 +110,7 @@ export default function HomeScreen({ navigation }) {
                     <View style={styles.mascotRow}>
                         <Image
                             source={latestEvent ? CHAR_SURPRISED : CHAR_HAPPY}
-                            style={styles.mascotImg}
+                            style={[styles.mascotImg, { width: mascotSize, height: mascotSize }]}
                             resizeMode="contain"
                         />
                         <View style={styles.bubble}>
@@ -122,17 +134,21 @@ export default function HomeScreen({ navigation }) {
                     </View>
 
                 </SafeAreaView>
-            </LinearGradient>
+            </View>
 
             {/* Quick actions — floating card between header and body */}
             <View style={styles.quickActions}>
                 <TouchableOpacity style={styles.quickBtn} onPress={() => navigation.navigate('Events')}>
-                    <Text style={styles.quickIcon}>📅</Text>
+                    <View style={styles.quickIconWrap}>
+                        <Ionicons name="calendar" size={22} color="#4A6CF7" />
+                    </View>
                     <Text style={styles.quickLabel}>Upcoming{'\n'}Events</Text>
                 </TouchableOpacity>
                 <View style={styles.divider} />
                 <TouchableOpacity style={styles.quickBtn} onPress={() => navigation.navigate('Orgs')}>
-                    <Text style={styles.quickIcon}>🏛</Text>
+                    <View style={styles.quickIconWrap}>
+                        <Ionicons name="business" size={22} color="#4A6CF7" />
+                    </View>
                     <Text style={styles.quickLabel}>Explore{'\n'}Organizations</Text>
                 </TouchableOpacity>
             </View>
@@ -179,8 +195,13 @@ export default function HomeScreen({ navigation }) {
 
 const styles = StyleSheet.create({
     root: { flex: 1, backgroundColor: '#f0f2ff' },
-     // Header
-    header: { paddingHorizontal: 20 },
+    // Header
+    header: { paddingHorizontal: 20, paddingBottom: 70 },
+    headerGradient: {
+        position: 'absolute',
+        top: 0, left: 0, right: 0,
+        height: 260,           
+    },
     headerRow: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', paddingTop: 10 },
     greeting: { fontSize: 22, fontWeight: '600', color: '#fff' },
     subGreeting: { fontSize: 13, color: 'rgba(255,255,255,0.75)', marginTop: 2 },
@@ -195,7 +216,7 @@ const styles = StyleSheet.create({
         backgroundColor: '#fff',
         borderRadius: 18,
         marginHorizontal: 20,
-        marginTop: -50,
+        marginTop: -70,
         paddingVertical: 16,
         paddingHorizontal: 20,
         shadowColor: '#4A6CF7',
@@ -206,7 +227,11 @@ const styles = StyleSheet.create({
         zIndex: 10,
     },
     quickBtn: { flex: 1, flexDirection: 'row', alignItems: 'center', gap: 10 },
-    quickIcon: { fontSize: 22 },
+    quickIconWrap: {
+        width: 40, height: 40, borderRadius: 12,
+        backgroundColor: '#eff3ff',
+        alignItems: 'center', justifyContent: 'center',
+    },
     quickLabel: { color: '#1e2f6e', fontSize: 13, fontWeight: '600', lineHeight: 18 },
     divider: { width: 1, backgroundColor: '#e8e8e8', marginHorizontal: 16 },
 
@@ -214,16 +239,16 @@ const styles = StyleSheet.create({
     mascotRow: {
         flexDirection: 'row',
         alignItems: 'center',
-        marginTop: 15,
-        marginBottom: 4,
+        marginTop: 12,
+        marginBottom: 0,
     },
-    mascotImg: { width: 130, height: 130 },
+    mascotImg: { width: 110, height: 110 },
     bubble: {
         flex: 1,
         backgroundColor: 'rgba(255,255,255,0.2)',
         borderRadius: 12,
-        padding: 10,
-        marginLeft: -5,
+        padding: 12,
+        marginLeft: 4,
     },
     bubbleTail: {
         position: 'absolute',

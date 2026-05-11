@@ -16,15 +16,14 @@ return new class extends Migration
             $table->json('interest')->nullable();
             $table->json('skill_to_improve')->nullable();
             $table->json('preferred_activity')->nullable();
-            $table->boolean('profile_completed');
+            $table->boolean('profile_completed')->default(false);
             $table->string('profile_photo')->nullable();
+            $table->timestamps();
         });
     }
 
     public function down(): void
     {
-        Schema::table('users', function (Blueprint $table) {
-            $table->dropColumn(['program', 'interest', 'skill', 'preferred_activity', 'profile_completed', 'profile_photo']);
-        });
+        Schema::dropIfExists('user_profiles');
     }
 };

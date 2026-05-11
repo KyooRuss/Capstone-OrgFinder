@@ -1,9 +1,13 @@
 import React, { useEffect, useRef } from 'react';
-import { View, Text, StyleSheet, Animated, Image } from 'react-native';
+import { View, Text, StyleSheet, Animated, Image, useWindowDimensions } from 'react-native';
 
 export default function SplashScreen() {
-    const scale = useRef(new Animated.Value(0.7)).current;
+    const { width } = useWindowDimensions();
+    const scale   = useRef(new Animated.Value(0.7)).current;
     const opacity = useRef(new Animated.Value(0)).current;
+
+    const logoSize  = Math.min(Math.round(width * 0.27), 110);
+    const titleSize = Math.min(Math.round(width * 0.075), 30);
 
     useEffect(() => {
         Animated.parallel([
@@ -14,13 +18,13 @@ export default function SplashScreen() {
 
     return (
         <View style={styles.container}>
-            <Animated.View style={{ transform: [{ scale }], opacity }}>
+            <Animated.View style={{ transform: [{ scale }], opacity, alignItems: 'center' }}>
                 <Image
                     source={require('../../assets/orgfinder-logo.png')}
-                    style={styles.logo}
+                    style={{ width: logoSize, height: logoSize, marginBottom: 16 }}
                     resizeMode="contain"
                 />
-                <Text style={styles.title}>ORGFINDER</Text>
+                <Text style={[styles.title, { fontSize: titleSize }]}>ORGFINDER</Text>
             </Animated.View>
         </View>
     );
@@ -33,15 +37,8 @@ const styles = StyleSheet.create({
         alignItems: 'center',
         justifyContent: 'center',
     },
-    logo: {
-        width: 100,
-        height: 100,
-        alignSelf: 'center',
-        marginBottom: 16,
-    },
     title: {
         color: '#fff',
-        fontSize: 28,
         fontWeight: '800',
         letterSpacing: 4,
         textAlign: 'center',

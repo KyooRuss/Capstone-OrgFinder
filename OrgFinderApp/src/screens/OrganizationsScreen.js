@@ -2,6 +2,7 @@ import React, { useState, useEffect, useCallback } from 'react';
 import {
     View, Text, TextInput, TouchableOpacity, StyleSheet,
     FlatList, Image, ActivityIndicator, RefreshControl, Modal, ScrollView,
+    useWindowDimensions,
 } from 'react-native';
 import { LinearGradient } from 'expo-linear-gradient';
 import { SafeAreaView } from 'react-native-safe-area-context';
@@ -15,6 +16,9 @@ const CATEGORIES = [
 ];
 
 export default function OrganizationsScreen({ navigation }) {
+    const { width, height } = useWindowDimensions();
+    const headerSpacing = Math.round(height * 0.03);
+
     const [orgs, setOrgs]             = useState([]);
     const [loading, setLoading]       = useState(true);
     const [refreshing, setRefreshing] = useState(false);
@@ -35,33 +39,36 @@ export default function OrganizationsScreen({ navigation }) {
 
     useEffect(() => { setLoading(true); loadOrgs(); }, [category]);
 
-    const renderOrg = ({ item }) => (
-        <TouchableOpacity
-            style={styles.orgCard}
-            onPress={() => navigation.navigate('OrgDetail', { id: item.id })}
-            activeOpacity={0.85}
-        >
-            {item.logo
-                ? <Image source={{ uri: item.logo }} style={styles.orgLogo} />
-                : <View style={[styles.orgLogo, styles.orgLogoFallback]}>
-                    <Text style={styles.orgLogoText}>{item.name?.[0] ?? 'O'}</Text>
-                  </View>
-            }
-            <View style={styles.cardBody}>
-                <Text style={styles.orgName} numberOfLines={2}>{item.name}</Text>
-                {item.mission ? (
-                    <Text style={styles.orgMission} numberOfLines={2}>{item.mission}</Text>
-                ) : null}
-                <Text style={styles.viewDetails}>View Details</Text>
-            </View>
-        </TouchableOpacity>
-    );
+    const renderOrg = ({ item }) => {
+        const logoSize = Math.min(Math.round(width * 0.15), 64);
+        return (
+            <TouchableOpacity
+                style={styles.orgCard}
+                onPress={() => navigation.navigate('OrgDetail', { id: item.id })}
+                activeOpacity={0.85}
+            >
+                {item.logo
+                    ? <Image source={{ uri: item.logo }} style={[styles.orgLogo, { width: logoSize, height: logoSize, borderRadius: logoSize / 2 }]} />
+                    : <View style={[styles.orgLogo, styles.orgLogoFallback, { width: logoSize, height: logoSize, borderRadius: logoSize / 2 }]}>
+                        <Text style={styles.orgLogoText}>{item.name?.[0] ?? 'O'}</Text>
+                      </View>
+                }
+                <View style={styles.cardBody}>
+                    <Text style={styles.orgName} numberOfLines={2}>{item.name}</Text>
+                    {item.mission ? (
+                        <Text style={styles.orgMission} numberOfLines={2}>{item.mission}</Text>
+                    ) : null}
+                    <Text style={styles.viewDetails}>View Details</Text>
+                </View>
+            </TouchableOpacity>
+        );
+    };
 
     return (
         <View style={styles.root}>
             <LinearGradient colors={['#7CB9FF', '#4A6CF7']} start={{ x: 0, y: 0 }} end={{ x: 1, y: 1 }} style={styles.header}>
                 <SafeAreaView>
-                    <View style={styles.headerRow}>
+                    <View style={[styles.headerRow, { marginBottom: headerSpacing }]}>
                         <TouchableOpacity onPress={() => navigation.goBack()} style={styles.backBtn}>
                             <Text style={styles.backIcon}>‹</Text>
                         </TouchableOpacity>
@@ -92,7 +99,7 @@ export default function OrganizationsScreen({ navigation }) {
 
             {/* Category dropdown modal */}
             <Modal visible={showCatModal} transparent animationType="fade" onRequestClose={() => setShowCatModal(false)}>
-                <TouchableOpacity style={styles.modalOverlay} activeOpacity={1} onPress={() => setShowCatModal(false)}>
+                <TouchableOpacity style={[styles.modalOverlay, { paddingTop: Math.round(height * 0.15) }]} activeOpacity={1} onPress={() => setShowCatModal(false)}>
                     <View style={styles.modalBox}>
                         <ScrollView nestedScrollEnabled showsVerticalScrollIndicator={false}>
                             {CATEGORIES.map(cat => (
@@ -136,8 +143,8 @@ export default function OrganizationsScreen({ navigation }) {
 
 const styles = StyleSheet.create({
     root: { flex: 1, backgroundColor: '#f5f6fa' },
-    header: { paddingHorizontal: 16 },
-    headerRow: { flexDirection: 'row', alignItems: 'center', paddingTop: 8, marginBottom: 40 },
+    header: { paddingHorizontal: 16, paddingBottom: 20 },
+    headerRow: { flexDirection: 'row', alignItems: 'center', paddingTop: 8 },
     backBtn: { padding: 4, marginRight: 8 },
     backIcon: { color: '#fff', fontSize: 28, lineHeight: 28 },
     headerTitle: { color: '#fff', fontSize: 20, fontWeight: '700' },
@@ -157,7 +164,7 @@ const styles = StyleSheet.create({
     // Category modal
     modalOverlay: {
         flex: 1, backgroundColor: 'rgba(0,0,0,0.35)',
-        justifyContent: 'flex-start', paddingTop: 120, paddingHorizontal: 16,
+        justifyContent: 'flex-start', paddingHorizontal: 16,
         alignItems: 'flex-end',
     },
     modalBox: {
@@ -180,7 +187,7 @@ const styles = StyleSheet.create({
         shadowColor: '#000', shadowOffset: { width: 0, height: 2 },
         shadowOpacity: 0.07, shadowRadius: 8, elevation: 3,
     },
-    orgLogo: { width: 60, height: 60, borderRadius: 30, flexShrink: 0 },
+    orgLogo: { flexShrink: 0 },
     orgLogoFallback: { backgroundColor: '#4A6CF7', alignItems: 'center', justifyContent: 'center' },
     orgLogoText: { color: '#fff', fontSize: 22, fontWeight: '700' },
     cardBody: { flex: 1 },

@@ -3,15 +3,21 @@ import {
     View, Text, TextInput, TouchableOpacity,
     StyleSheet, Image, KeyboardAvoidingView,
     Platform, ScrollView, ActivityIndicator, Alert,
+    useWindowDimensions,
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { AuthContext } from '../context/AuthContext';
 
 export default function LoginScreen() {
     const { login } = useContext(AuthContext);
+    const { width, height } = useWindowDimensions();
     const [email, setEmail]       = useState('');
     const [password, setPassword] = useState('');
     const [loading, setLoading]   = useState(false);
+
+    const helloSize   = Math.min(Math.round(width * 0.12), 52);
+    const titleSize   = Math.min(Math.round(width * 0.072), 28);
+    const inputHeight = Math.max(Math.round(height * 0.065), 48);
 
     const handleLogin = async () => {
         if (!email.trim() || !password.trim()) {
@@ -33,7 +39,7 @@ export default function LoginScreen() {
             {/* Blue top section */}
             <View style={styles.topSection}>
                 <SafeAreaView>
-                    <Text style={styles.hello}>Hello!</Text>
+                    <Text style={[styles.hello, { fontSize: helloSize }]}>Hello!</Text>
                     <Text style={styles.welcome}>Welcome to OrgFinder</Text>
                 </SafeAreaView>
             </View>
@@ -44,9 +50,9 @@ export default function LoginScreen() {
                 style={styles.cardWrap}
             >
                 <ScrollView contentContainerStyle={styles.card} keyboardShouldPersistTaps="handled">
-                    <Text style={styles.loginTitle}>Login</Text>
+                    <Text style={[styles.loginTitle, { fontSize: titleSize }]}>Login</Text>
 
-                    <View style={styles.inputWrap}>
+                    <View style={[styles.inputWrap, { height: inputHeight }]}>
                         <Text style={styles.inputIcon}>👤</Text>
                         <TextInput
                             style={styles.input}
@@ -59,7 +65,7 @@ export default function LoginScreen() {
                         />
                     </View>
 
-                    <View style={styles.inputWrap}>
+                    <View style={[styles.inputWrap, { height: inputHeight }]}>
                         <Text style={styles.inputIcon}>🔒</Text>
                         <TextInput
                             style={styles.input}
@@ -76,7 +82,7 @@ export default function LoginScreen() {
                     </TouchableOpacity>
 
                     <TouchableOpacity
-                        style={[styles.loginBtn, loading && { opacity: 0.7 }]}
+                        style={[styles.loginBtn, { height: inputHeight }, loading && { opacity: 0.7 }]}
                         onPress={handleLogin}
                         disabled={loading}
                     >
@@ -101,7 +107,6 @@ const styles = StyleSheet.create({
         paddingBottom: 40,
     },
     hello: {
-        fontSize: 48,
         fontWeight: '800',
         color: '#fff',
         marginBottom: 6,
@@ -121,7 +126,6 @@ const styles = StyleSheet.create({
         paddingBottom: 50,
     },
     loginTitle: {
-        fontSize: 28,
         fontWeight: '700',
         color: '#1e2f6e',
         marginBottom: 24,
@@ -133,7 +137,6 @@ const styles = StyleSheet.create({
         borderRadius: 12,
         paddingHorizontal: 14,
         marginBottom: 14,
-        height: 52,
     },
     inputIcon: { fontSize: 16, marginRight: 10 },
     input: { flex: 1, fontSize: 15, color: '#333' },
@@ -142,7 +145,6 @@ const styles = StyleSheet.create({
     loginBtn: {
         backgroundColor: '#1e3a8a',
         borderRadius: 28,
-        height: 52,
         alignItems: 'center',
         justifyContent: 'center',
     },

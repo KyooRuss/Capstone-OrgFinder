@@ -11,6 +11,7 @@ use App\Http\Controllers\AdminOfficer\OrganizationController as AdminOfficerOrgC
 use App\Http\Controllers\AdminOfficer\EventController as AdminOfficerEventController;
 use App\Http\Controllers\AdminOfficer\MemberController;
 use App\Http\Controllers\AdminOfficer\OfficerController;
+use App\Http\Controllers\AdminOfficer\RecruitmentController;
 use App\Http\Controllers\AdminOfficer\TrashController as AdminOfficerTrashController;
 use Illuminate\Support\Facades\Route;
 
@@ -110,6 +111,11 @@ Route::prefix('admin-officer')->name('admin-officer.')->group(function () {
             Route::post('/', [AdminOfficerEventController::class, 'store'])->name('store');
             Route::delete('/{event}', [AdminOfficerEventController::class, 'destroy'])->name('destroy');
         });
+
+        // Recruitment
+        Route::post('/recruitment/toggle', [RecruitmentController::class, 'toggle'])->name('recruitment.toggle');
+        Route::get('/recruitment/applications', [RecruitmentController::class, 'applications'])->name('recruitment.applications');
+        Route::post('/recruitment/applications/{membershipRequest}/status', [RecruitmentController::class, 'updateStatus'])->name('recruitment.status');
 
         // Members
         Route::prefix('members')->name('members.')->group(function () {

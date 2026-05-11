@@ -29,7 +29,7 @@ class OrganizationApiController extends Controller
     public function index(Request $request)
     {
         $user  = $request->user();
-        $query = Organization::with(['photos', 'reasons', 'testimonials'])
+        $query = Organization::with(['photos', 'reasons', 'testimonials', 'membershipRequests'])
             ->whereNull('deleted_at');
 
         if ($search = $request->query('search')) {
@@ -50,33 +50,40 @@ class OrganizationApiController extends Controller
         return response()->json(['organizations' => $orgs->map(fn($o) => $this->orgResource($o))]);
     }
 
-    public function show(int $id)
+    public function show(Request $request, int $id)
     {
-        $org = Organization::with(['photos', 'reasons', 'testimonials', 'events' => function ($q) {
+        $org = Organization::with(['photos', 'reasons', 'testimonials', 'membershipRequests', 'events' => function ($q) {
             $q->where('status', 'approved')
               ->orderByDesc('date')
               ->limit(12);
         }])->findOrFail($id);
 
-        return response()->json(['organization' => $this->orgDetailResource($org)]);
+        $myRequest = $org->membershipRequests
+            ->where('user_id', $request->user()->id)
+            ->first();
+
+        return response()->json(['organization' => $this->orgDetailResource($org, $myRequest?->status)]);
     }
 
     private function orgResource(Organization $org): array
     {
         return [
-            'id'       => $org->id,
-            'name'     => $org->org_name,
-            'category' => $org->category,
-            'president'=> $org->president,
-            'mission'  => $org->mission,
-            'logo'     => $org->logo ? asset('storage/' . $org->logo) : null,
+            'id'           => $org->id,
+            'name'         => $org->org_name,
+            'category'     => $org->category,
+            'president'    => $org->president,
+            'mission'      => $org->mission,
+            'logo'         => $org->logo ? asset('storage/' . $org->logo) : null,
+            'is_recruiting'=> $org->is_recruiting,
         ];
     }
 
-    private function orgDetailResource(Organization $org): array
+    private function orgDetailResource(Organization $org, ?string $myRequestStatus = null): array
     {
         return [
             'id'               => $org->id,
+            'is_recruiting'    => $org->is_recruiting,
+            'my_request_status'=> $myRequestStatus,
             'name'             => $org->org_name,
             'category'         => $org->category,
             'president'        => $org->president,

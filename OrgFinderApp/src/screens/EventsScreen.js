@@ -2,12 +2,17 @@ import React, { useState, useEffect, useCallback } from 'react';
 import {
     View, Text, TextInput, TouchableOpacity, StyleSheet,
     FlatList, Image, ActivityIndicator, RefreshControl, Modal, ScrollView,
+    useWindowDimensions,
 } from 'react-native';
 import { LinearGradient } from 'expo-linear-gradient';
 import { SafeAreaView } from 'react-native-safe-area-context';
+import { Ionicons } from '@expo/vector-icons';
 import api from '../api/client';
 
 export default function EventsScreen({ navigation }) {
+    const { height } = useWindowDimensions();
+    const headerSpacing = Math.round(height * 0.03);
+
     const [events, setEvents]         = useState([]);
     const [orgs, setOrgs]             = useState([]);
     const [loading, setLoading]       = useState(true);
@@ -52,18 +57,18 @@ export default function EventsScreen({ navigation }) {
             <View style={styles.eventInfo}>
                 <Text style={styles.eventTitle} numberOfLines={3}>{item.title}</Text>
                 <View style={styles.metaRow}>
-                    <Text style={styles.metaIcon}>📅</Text>
+                    <Ionicons name="calendar-outline" size={13} color="#000000" />
                     <Text style={styles.metaText}>{item.date}</Text>
                 </View>
                 {item.time ? (
                     <View style={styles.metaRow}>
-                        <Text style={styles.metaIcon}>🕐</Text>
+                        <Ionicons name="time-outline" size={13} color="#000000" />
                         <Text style={styles.metaText}>{item.time}</Text>
                     </View>
                 ) : null}
                 {item.venue ? (
                     <View style={styles.metaRow}>
-                        <Text style={styles.metaIcon}>📍</Text>
+                        <Ionicons name="location-outline" size={13} color="#000000" />
                         <Text style={styles.metaText}>{item.venue}</Text>
                     </View>
                 ) : null}
@@ -81,7 +86,7 @@ export default function EventsScreen({ navigation }) {
         <View style={styles.root}>
             <LinearGradient colors={['#7CB9FF', '#4A6CF7']} start={{ x: 0, y: 0 }} end={{ x: 1, y: 1 }} style={styles.header}>
                 <SafeAreaView>
-                    <View style={styles.headerRow}>
+                    <View style={[styles.headerRow, { marginBottom: headerSpacing }]}>
                         <TouchableOpacity onPress={() => navigation.goBack()} style={styles.backBtn}>
                             <Text style={styles.backIcon}>‹</Text>
                         </TouchableOpacity>
@@ -111,7 +116,7 @@ export default function EventsScreen({ navigation }) {
 
             {/* Org filter modal */}
             <Modal visible={showOrgModal} transparent animationType="fade" onRequestClose={() => setShowOrgModal(false)}>
-                <TouchableOpacity style={styles.modalOverlay} activeOpacity={1} onPress={() => setShowOrgModal(false)}>
+                <TouchableOpacity style={[styles.modalOverlay, { paddingTop: Math.round(height * 0.15) }]} activeOpacity={1} onPress={() => setShowOrgModal(false)}>
                     <View style={styles.modalBox}>
                         <ScrollView nestedScrollEnabled showsVerticalScrollIndicator={false}>
                             <TouchableOpacity
@@ -163,8 +168,8 @@ export default function EventsScreen({ navigation }) {
 
 const styles = StyleSheet.create({
     root: { flex: 1, backgroundColor: '#e8eff7' },
-    header: { paddingHorizontal: 16 },
-    headerRow: { flexDirection: 'row', alignItems: 'center', paddingTop: 8, marginBottom: 40 },
+    header: { paddingHorizontal: 16, paddingBottom: 20 },
+    headerRow: { flexDirection: 'row', alignItems: 'center', paddingTop: 8 },
     backBtn: { padding: 4, marginRight: 8 },
     backIcon: { color: '#fff', fontSize: 28, lineHeight: 28 },
     headerTitle: { color: '#fff', fontSize: 20, fontWeight: '700' },
@@ -185,7 +190,7 @@ const styles = StyleSheet.create({
     // Org modal
     modalOverlay: {
         flex: 1, backgroundColor: 'rgba(0,0,0,0.35)',
-        justifyContent: 'flex-start', paddingTop: 120, paddingHorizontal: 16,
+        justifyContent: 'flex-start', paddingHorizontal: 16,
         alignItems: 'flex-end',
     },
     modalBox: {
@@ -208,12 +213,11 @@ const styles = StyleSheet.create({
         elevation: 2, shadowColor: '#000', shadowOffset: { width: 0, height: 1 },
         shadowOpacity: 0.08, shadowRadius: 6,
     },
-    poster: { width: 110, height: '100%', minHeight: 130 },
-    posterPlaceholder: { width: 110, minHeight: 130, backgroundColor: '#fff' },
+    poster: { width: 110, height: 130 },
+    posterPlaceholder: { width: 110, height: 130, backgroundColor: '#dde4f0' },
     eventInfo: { flex: 1, padding: 12, justifyContent: 'space-between' },
     eventTitle: { fontSize: 14, fontWeight: '700', color: '#0f2044', marginBottom: 8, lineHeight: 20 },
     metaRow: { flexDirection: 'row', alignItems: 'center', gap: 6, marginBottom: 3 },
-    metaIcon: { fontSize: 12 },
     metaText: { fontSize: 12, color: '#334155', flex: 1 },
     viewDetailsWrap: { alignSelf: 'flex-end', marginTop: 8 },
     viewDetailsLink: {

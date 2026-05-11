@@ -8,13 +8,27 @@
 <div class="card">
     <div class="toolbar">
         <div class="toolbar-left">Total Students: {{ count($students) }}</div>
-        <form method="GET" style="display:flex;gap:8px;align-items:center;">
+        <form method="GET" style="display:flex;gap:8px;align-items:center;flex-wrap:wrap;">
             <div class="search-box">
                 <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#94a3b8" stroke-width="2"><circle cx="11" cy="11" r="6"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
                 <input type="text" name="search" placeholder="Search students..." value="{{ request('search') }}">
             </div>
+            <select name="org_id" onchange="this.form.submit()" style="height:36px;padding:0 10px;border:1px solid #e2e8f0;border-radius:6px;font-size:13px;color:#374151;background:#fff;cursor:pointer;min-width:160px;">
+                <option value="">All Organizations</option>
+                <option value="none" {{ request('org_id') === 'none' ? 'selected' : '' }}>No Organization</option>
+                @foreach($organizations as $org)
+                    <option value="{{ $org->id }}" {{ request('org_id') == $org->id ? 'selected' : '' }}>
+                        {{ $org->org_name }}
+                    </option>
+                @endforeach
+            </select>
+            @if(request('filter'))
+                <input type="hidden" name="filter" value="{{ request('filter') }}">
+            @endif
             <div class="filter-wrap">
-                <button type="button" class="filter-btn">Filter ▼</button>
+                <button type="button" class="filter-btn">
+                    {{ request('filter') ? ucfirst(request('filter')) : 'Status' }} ▼
+                </button>
                 <div class="filter-drop">
                     <a href="{{ request()->fullUrlWithQuery(['filter' => '']) }}">All</a>
                     <a href="{{ request()->fullUrlWithQuery(['filter' => 'active']) }}">Active</a>
@@ -33,6 +47,7 @@
                     <th>First Name</th>
                     <th>Year Level</th>
                     <th>Email Address</th>
+                    <th>Organizations</th>
                     <th>Status</th>
                     <th style="text-align:center">Action</th>
                 </tr>
@@ -45,6 +60,13 @@
                     <td><span style="color:#3b82f6;font-weight:600;">{{ $student['first_name'] }}</span></td>
                     <td>{{ $student['year_level'] }}</td>
                     <td>{{ $student['email'] }}</td>
+                    <td>
+                        @forelse($student['organizations'] as $org)
+                            <span style="display:inline-block;background:#eff6ff;color:#3b82f6;border:1px solid #bfdbfe;border-radius:4px;padding:2px 8px;font-size:11px;font-weight:600;margin:2px 2px 2px 0;white-space:nowrap;">{{ $org['name'] }}</span>
+                        @empty
+                            <span style="color:#94a3b8;font-size:12px;">—</span>
+                        @endforelse
+                    </td>
                     <td>
                         @if($student['status'] === 'active')
                             <span class="badge badge-success">Active</span>
@@ -71,7 +93,7 @@
                 </tr>
                 @empty
                 <tr>
-                    <td colspan="6" style="text-align:center;color:#94a3b8;padding:40px;">No students found.</td>
+                    <td colspan="8" style="text-align:center;color:#94a3b8;padding:40px;">No students found.</td>
                 </tr>
                 @endforelse
             </tbody>

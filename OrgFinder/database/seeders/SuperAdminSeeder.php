@@ -13,10 +13,11 @@ class SuperAdminSeeder extends Seeder
         User::updateOrCreate(
             ['email' => 'superadmin@orgfinder.com'],
             [
-                'name'     => 'Russell Brian Silagan',
-                'password' => Hash::make('password'),
-                'role'     => 'super_admin',
-                'status'   => 'active',
+                'first_name' => 'Russell Brian',
+                'last_name'  => 'Silagan',
+                'password'   => Hash::make('password'),
+                'role'       => 'super_admin',
+                'status'     => 'active',
             ]
         );
     }

@@ -10,69 +10,72 @@ class SampleUsersSeeder extends Seeder
 {
     public function run(): void
     {
-        // Sample student with completed profile
-        User::updateOrCreate(
+        $student1 = User::updateOrCreate(
             ['email' => 'student1@orgfinder.com'],
             [
-                'name'             => 'Maria Santos',
-                'password'         => Hash::make('password'),
-                'role'             => 'student',
-                'student_number'   => '2021-00001',
-                'year_level'       => 3,
-                'program'          => 'BS Information Technology',
-                'interests'        => ['Technology', 'Design', 'Music'],
-                'skills'           => ['Programming', 'UI/UX Design'],
-                'activities'       => ['Hackathons', 'Seminars'],
-                'profile_completed'=> true,
-                'status'           => 'active',
+                'first_name'     => 'Maria',
+                'last_name'      => 'Santos',
+                'password'       => Hash::make('password'),
+                'role'           => 'student',
+                'student_number' => '2021-00001',
+                'year_level'     => 3,
+                'status'         => 'active',
             ]
         );
+        $student1->profile()->updateOrCreate([], [
+            'year_level'        => 3,
+            'program'           => 'BS Information Technology',
+            'interest'          => ['Technology', 'Design', 'Music'],
+            'skill_to_improve'  => ['Programming', 'UI/UX Design'],
+            'preferred_activity'=> ['Hackathons', 'Seminars'],
+            'profile_completed' => true,
+        ]);
 
-        // Sample student with completed profile
-        User::updateOrCreate(
+        $student2 = User::updateOrCreate(
             ['email' => 'student2@orgfinder.com'],
             [
-                'name'             => 'Juan dela Cruz',
-                'password'         => Hash::make('password'),
-                'role'             => 'student',
-                'student_number'   => '2022-00002',
-                'year_level'       => 2,
-                'program'          => 'BS Computer Science',
-                'interests'        => ['Sports', 'Technology', 'Volunteering'],
-                'skills'           => ['Web Development', 'Public Speaking'],
-                'activities'       => ['Sports Fest', 'Community Service'],
-                'profile_completed'=> true,
-                'status'           => 'active',
+                'first_name'     => 'Juan',
+                'last_name'      => 'dela Cruz',
+                'password'       => Hash::make('password'),
+                'role'           => 'student',
+                'student_number' => '2022-00002',
+                'year_level'     => 2,
+                'status'         => 'active',
             ]
         );
+        $student2->profile()->updateOrCreate([], [
+            'year_level'        => 2,
+            'program'           => 'BS Computer Science',
+            'interest'          => ['Sports', 'Technology', 'Volunteering'],
+            'skill_to_improve'  => ['Web Development', 'Public Speaking'],
+            'preferred_activity'=> ['Sports Fest', 'Community Service'],
+            'profile_completed' => true,
+        ]);
 
-        // Sample student with incomplete profile
-        User::updateOrCreate(
+        $student3 = User::updateOrCreate(
             ['email' => 'student3@orgfinder.com'],
             [
-                'name'             => 'Ana Reyes',
-                'password'         => Hash::make('password'),
-                'role'             => 'student',
-                'student_number'   => '2023-00003',
-                'year_level'       => 1,
-                'program'          => null,
-                'interests'        => [],
-                'skills'           => [],
-                'activities'       => [],
-                'profile_completed'=> false,
-                'status'           => 'active',
+                'first_name'     => 'Ana',
+                'last_name'      => 'Reyes',
+                'password'       => Hash::make('password'),
+                'role'           => 'student',
+                'student_number' => '2023-00003',
+                'year_level'     => 1,
+                'status'         => 'active',
             ]
         );
+        $student3->profile()->updateOrCreate([], [
+            'profile_completed' => false,
+        ]);
 
-        // Sample admin officer
         User::updateOrCreate(
             ['email' => 'admin@orgfinder.com'],
             [
-                'name'             => 'Carlos Mendoza',
-                'password'         => Hash::make('password'),
-                'role'             => 'admin_officer',
-                'status'           => 'active',
-                'profile_completed'=> true,
+                'first_name' => 'Carlos',
+                'last_name'  => 'Mendoza',
+                'password'   => Hash::make('password'),
+                'role'       => 'admin_officer',
+                'status'     => 'active',
             ]
         );
     }

@@ -163,7 +163,7 @@ const styles = StyleSheet.create({
         paddingHorizontal: 16,
     },
     backIcon: { color: '#fff', fontSize: 28, lineHeight: 28, marginRight: 4 },
-    backLabel: { color: '#fff', fontSize: 18, fontWeight: '600', marginLeft: '6' },
+    backLabel: { color: '#fff', fontSize: 18, fontWeight: '600', marginLeft: 6 },
     card: {
         alignItems: 'center',
         paddingBottom: 30,

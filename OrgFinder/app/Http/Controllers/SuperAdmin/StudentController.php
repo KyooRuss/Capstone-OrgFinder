@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\SuperAdmin;
 
 use App\Http\Controllers\Controller;
+use App\Models\Organization;
 use App\Models\User;
 use App\Models\UserProfile;
 use Illuminate\Http\Request;
@@ -14,15 +15,27 @@ class StudentController extends Controller
         $query = User::where('role', 'student');
 
         if ($request->filled('search')) {
-            $query->where('last_name', 'like', '%' . $request->search . '%')
+            $query->where(function ($q) use ($request) {
+                $q->where('last_name', 'like', '%' . $request->search . '%')
                   ->orWhere('first_name', 'like', '%' . $request->search . '%');
+            });
         }
 
         if ($request->filled('filter') && in_array($request->filter, ['active', 'blocked'])) {
             $query->where('status', $request->filter);
         }
 
-        $students = $query->with('profile')->latest()->get()->map(function ($user, $index) {
+        if ($request->filled('org_id')) {
+            if ($request->org_id === 'none') {
+                $query->whereDoesntHave('organizations');
+            } else {
+                $query->whereHas('organizations', fn($q) => $q->where('organizations.id', $request->org_id));
+            }
+        }
+
+        $organizations = Organization::orderBy('org_name')->get(['id', 'org_name']);
+
+        $students = $query->with(['profile', 'organizations'])->latest()->get()->map(function ($user, $index) {
             return [
                 'id'             => $user->id,
                 'student_number' => $user->profile?->student_number ?? 'S' . str_pad($index + 1, 4, '0', STR_PAD_LEFT),
@@ -31,11 +44,11 @@ class StudentController extends Controller
                 'year_level'     => $user->profile?->year_level ?? '—',
                 'email'          => $user->email,
                 'status'         => $user->status,
+                'organizations'  => $user->organizations->map(fn($o) => ['id' => $o->id, 'name' => $o->org_name])->toArray(),
             ];
         });
 
-
-        return view('super-admin.students.index', compact('students'));
+        return view('super-admin.students.index', compact('students', 'organizations'));
     }
 
     public function search(Request $request)

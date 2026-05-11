@@ -5,6 +5,7 @@ use App\Http\Controllers\Api\ProfileApiController;
 use App\Http\Controllers\Api\OrganizationApiController;
 use App\Http\Controllers\Api\EventApiController;
 use App\Http\Controllers\Api\RecommendationApiController;
+use App\Http\Controllers\Api\MembershipRequestApiController;
 use Illuminate\Support\Facades\Route;
 
 // Public
@@ -26,4 +27,7 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::get('/events/{id}', [EventApiController::class, 'show']);
 
     Route::get('/recommendations', [RecommendationApiController::class, 'index']);
+
+    Route::post('/organizations/{id}/apply', [MembershipRequestApiController::class, 'apply']);
+    Route::get('/organizations/{id}/my-status', [MembershipRequestApiController::class, 'myStatus']);
 });
