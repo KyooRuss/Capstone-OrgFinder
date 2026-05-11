@@ -42,15 +42,15 @@ export default function EventsScreen({ navigation }) {
             onPress={() => navigation.navigate('EventDetail', { id: item.id })}
             activeOpacity={0.88}
         >
+            {/* Square poster on the left */}
             {item.poster
                 ? <Image source={{ uri: item.poster }} style={styles.poster} />
                 : <View style={styles.posterPlaceholder} />
             }
+
+            {/* Details on the right */}
             <View style={styles.eventInfo}>
-                <Text style={styles.eventTitle} numberOfLines={2}>{item.title}</Text>
-                {item.organization?.name ? (
-                    <Text style={styles.orgLabel}>{item.organization.name}</Text>
-                ) : null}
+                <Text style={styles.eventTitle} numberOfLines={3}>{item.title}</Text>
                 <View style={styles.metaRow}>
                     <Text style={styles.metaIcon}>📅</Text>
                     <Text style={styles.metaText}>{item.date}</Text>
@@ -67,7 +67,10 @@ export default function EventsScreen({ navigation }) {
                         <Text style={styles.metaText}>{item.venue}</Text>
                     </View>
                 ) : null}
-                <TouchableOpacity onPress={() => navigation.navigate('EventDetail', { id: item.id })}>
+                <TouchableOpacity
+                    style={styles.viewDetailsWrap}
+                    onPress={() => navigation.navigate('EventDetail', { id: item.id })}
+                >
                     <Text style={styles.viewDetailsLink}>View Details</Text>
                 </TouchableOpacity>
             </View>
@@ -197,23 +200,24 @@ const styles = StyleSheet.create({
     modalItemTextActive: { color: '#4A6CF7', fontWeight: '700' },
 
     // Cards
-    list: { padding: 16, gap: 16 },
+    list: { padding: 16, gap: 14 },
     eventCard: {
-        backgroundColor: '#d6e4f0', borderRadius: 18, overflow: 'hidden',
+        backgroundColor: '#fff', borderRadius: 16,
+        flexDirection: 'row', alignItems: 'stretch',
+        overflow: 'hidden',
         elevation: 2, shadowColor: '#000', shadowOffset: { width: 0, height: 1 },
         shadowOpacity: 0.08, shadowRadius: 6,
     },
-    poster: { width: '100%', height: 190 },
-    posterPlaceholder: { width: '100%', height: 190, backgroundColor: '#f0f5fa' },
-    eventInfo: { padding: 14 },
-    eventTitle: { fontSize: 15, fontWeight: '700', color: '#0f2044', marginBottom: 4 },
-    orgLabel: { fontSize: 12, color: '#4A6CF7', fontWeight: '600', marginBottom: 8 },
-    metaRow: { flexDirection: 'row', alignItems: 'center', gap: 8, marginBottom: 4 },
-    metaIcon: { fontSize: 13 },
-    metaText: { fontSize: 13, color: '#334155', flex: 1 },
+    poster: { width: 110, height: '100%', minHeight: 130 },
+    posterPlaceholder: { width: 110, minHeight: 130, backgroundColor: '#fff' },
+    eventInfo: { flex: 1, padding: 12, justifyContent: 'space-between' },
+    eventTitle: { fontSize: 14, fontWeight: '700', color: '#0f2044', marginBottom: 8, lineHeight: 20 },
+    metaRow: { flexDirection: 'row', alignItems: 'center', gap: 6, marginBottom: 3 },
+    metaIcon: { fontSize: 12 },
+    metaText: { fontSize: 12, color: '#334155', flex: 1 },
+    viewDetailsWrap: { alignSelf: 'flex-end', marginTop: 8 },
     viewDetailsLink: {
-        alignSelf: 'flex-end',
-        fontSize: 13, fontWeight: '700', color: '#4A6CF7',
+        fontSize: 12, fontWeight: '700', color: '#1e3a6e',
         textDecorationLine: 'underline',
     },
     empty: { textAlign: 'center', marginTop: 60, color: '#888', fontSize: 15 },

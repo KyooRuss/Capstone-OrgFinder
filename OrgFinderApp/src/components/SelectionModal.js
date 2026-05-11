@@ -12,6 +12,9 @@ export default function SelectionModal({ visible, title, subtitle, options, sele
             setLocal(local.filter(i => i !== item));
         } else if (local.length < max) {
             setLocal([...local, item]);
+        } else {
+            // Already at max — drop the oldest and add the new selection
+            setLocal([...local.slice(1), item]);
         }
     };
 
