@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\AdminOfficer;
 
 use App\Http\Controllers\Controller;
+use App\Models\OrganizationAccess;
 use App\Models\User;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Http\Request;
@@ -81,6 +82,14 @@ class TrashController extends Controller
     public function forceDeleteUser($id)
     {
         $user = User::onlyTrashed()->findOrFail($id);
+
+        $org = $this->myOrganization();
+        if ($org) {
+            OrganizationAccess::where('organization_id', $org->id)
+                ->where('user_id', $user->id)
+                ->delete();
+        }
+
         $user->forceDelete();
 
         return response()->json(['success' => true, 'message' => 'User permanently deleted.']);

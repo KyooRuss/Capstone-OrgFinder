@@ -47,7 +47,7 @@
                     <td><span class="td-no">M{{ str_pad($i + 1, 4, '0', STR_PAD_LEFT) }}</span></td>
                     <td><span class="td-name">{{ $member->last_name }}</span></td>
                     <td><span class="td-name">{{ $member->first_name }}</span></td>
-                    <td>{{ $member->year_level ?? '—' }}</td>
+                    <td>{{ $member->profile?->year_level ?? '—' }}</td>
                     <td><span class="td-email">{{ $member->email }}</span></td>
                     <td style="text-align:center">
                         <span class="status-{{ ($member->status ?? 'active') === 'active' ? 'active' : 'blocked' }}">

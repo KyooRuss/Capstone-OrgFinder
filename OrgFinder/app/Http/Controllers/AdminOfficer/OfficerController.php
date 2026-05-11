@@ -47,16 +47,19 @@ class OfficerController extends Controller
         return response()->json(['success' => true, 'message' => 'Officer blocked.']);
     }
 
+    public function unblock(User $user)
+    {
+        $this->authorizeOfficer($user);
+        $user->update(['status' => 'active']);
+
+        return response()->json(['success' => true, 'message' => 'Officer unblocked.']);
+    }
+
     public function destroy(User $user)
     {
         $this->authorizeOfficer($user);
 
-        $org = $this->myOrganization();
-        OrganizationAccess::where('organization_id', $org->id)
-            ->where('user_id', $user->id)
-            ->delete();
-
-        $user->update(['role' => 'student']);
+        $user->delete();
 
         return response()->json(['success' => true, 'message' => 'Officer removed.']);
     }

@@ -63,7 +63,8 @@
                             </svg>
                         </button>
                         @else
-                        <button class="icon-btn" disabled style="opacity:.4;cursor:default;">
+                        <button class="icon-btn" title="Unblock"
+                            onclick="confirmUnblock({{ $officer->id }}, '{{ addslashes($officer['first_name'] . ' ' . $officer['last_name']) }}')">
                             <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#22c55e" stroke-width="2">
                                 <circle cx="12" cy="12" r="10"/><line x1="4.93" y1="4.93" x2="19.07" y2="19.07"/>
                             </svg>
@@ -104,6 +105,23 @@
     </div>
 </div>
 
+{{-- Unblock Officer Confirm --}}
+<div class="modal-overlay" id="unblockOfficerModal">
+    <div class="modal" style="max-width:380px;text-align:center;">
+        <button class="modal-close" onclick="closeModal('unblockOfficerModal')">×</button>
+        <div class="modal-warn-icon">
+            <svg width="26" height="26" viewBox="0 0 24 24" fill="#22c55e"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 15l-5-5 1.41-1.41L10 14.17l7.59-7.59L19 8l-9 9z"/></svg>
+        </div>
+        <div class="modal-body">
+            Unblock officer<br>"<strong id="unblockOfficerName"></strong>"?
+        </div>
+        <div class="modal-actions">
+            <button class="btn btn-outline" onclick="closeModal('unblockOfficerModal')">Cancel</button>
+            <button class="btn btn-success" id="confirmUnblockBtn">Unblock</button>
+        </div>
+    </div>
+</div>
+
 {{-- Remove Officer Confirm --}}
 <div class="modal-overlay" id="removeOfficerModal">
     <div class="modal" style="max-width:380px;text-align:center;">
@@ -131,6 +149,11 @@ function confirmBlock(id, name) {
     document.getElementById('blockOfficerName').textContent = name;
     openModal('blockOfficerModal');
 }
+function confirmUnblock(id, name) {
+    currentId = id;
+    document.getElementById('unblockOfficerName').textContent = name;
+    openModal('unblockOfficerModal');
+}
 function confirmRemove(id, name) {
     currentId = id;
     document.getElementById('removeOfficerName').textContent = name;
@@ -139,6 +162,11 @@ function confirmRemove(id, name) {
 
 document.getElementById('confirmBlockBtn').addEventListener('click', function() {
     fetch(`/admin-officer/officers/${currentId}/block`, {
+        method: 'POST', headers: { 'X-CSRF-TOKEN': csrfToken(), 'Accept': 'application/json' }
+    }).then(() => location.reload());
+});
+document.getElementById('confirmUnblockBtn').addEventListener('click', function() {
+    fetch(`/admin-officer/officers/${currentId}/unblock`, {
         method: 'POST', headers: { 'X-CSRF-TOKEN': csrfToken(), 'Accept': 'application/json' }
     }).then(() => location.reload());
 });

@@ -117,6 +117,7 @@ Route::prefix('admin-officer')->name('admin-officer.')->group(function () {
             Route::post('/', [MemberController::class, 'store'])->name('store');
             Route::post('/{user}/make-officer', [MemberController::class, 'makeOfficer'])->name('make-officer');
             Route::post('/{user}/block', [MemberController::class, 'block'])->name('block');
+            Route::post('/{user}/unblock', [MemberController::class, 'unblock'])->name('unblock');
             Route::delete('/{user}', [MemberController::class, 'destroy'])->name('destroy');
         });
 
@@ -124,6 +125,7 @@ Route::prefix('admin-officer')->name('admin-officer.')->group(function () {
         Route::prefix('officers')->name('officers.')->group(function () {
             Route::get('/', [OfficerController::class, 'index'])->name('index');
             Route::post('/{user}/block', [OfficerController::class, 'block'])->name('block');
+            Route::post('/{user}/unblock', [OfficerController::class, 'unblock'])->name('unblock');
             Route::delete('/{user}', [OfficerController::class, 'destroy'])->name('destroy');
         });
 

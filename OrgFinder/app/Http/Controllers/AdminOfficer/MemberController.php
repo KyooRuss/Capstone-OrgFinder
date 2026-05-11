@@ -89,14 +89,20 @@ class MemberController extends Controller
         return response()->json(['success' => true, 'message' => 'Member blocked.']);
     }
 
+    public function unblock(User $user)
+    {
+        $this->authorizeMember($user);
+
+        $user->update(['status' => 'active']);
+
+        return response()->json(['success' => true, 'message' => 'Member unblocked.']);
+    }
+
     public function destroy(User $user)
     {
         $this->authorizeMember($user);
 
-        $org = $this->myOrganization();
-        OrganizationAccess::where('organization_id', $org->id)
-            ->where('user_id', $user->id)
-            ->delete();
+        $user->delete();
 
         return response()->json(['success' => true, 'message' => 'Member removed.']);
     }
