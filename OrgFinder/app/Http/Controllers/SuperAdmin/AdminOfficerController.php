@@ -54,8 +54,6 @@ class AdminOfficerController extends Controller
 
     public function destroy(User $user)
     {
-        $user->organizationAccess()->delete();
-        $user->update(['role' => 'student']);
         $user->delete();
 
         return response()->json(['message' => 'Admin officer removed successfully.']);

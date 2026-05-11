@@ -35,7 +35,11 @@ class OrganizationController extends Controller
             ? $organization->photos
             : collect();
 
-        return view('admin-officer.organization.index', compact('organization', 'eventPosters', 'testimonials', 'photos'));
+        $reasons = $organization
+            ? $organization->reasons
+            : collect();
+
+        return view('admin-officer.organization.index', compact('organization', 'eventPosters', 'testimonials', 'photos', 'reasons'));
     }
 
     public function edit()
@@ -46,7 +50,7 @@ class OrganizationController extends Controller
             return redirect()->route('admin-officer.organization.index');
         }
 
-        $organization->load(['photos', 'testimonials']);
+        $organization->load(['photos', 'testimonials', 'reasons']);
 
         return view('admin-officer.organization.edit', compact('organization'));
     }
@@ -73,6 +77,8 @@ class OrganizationController extends Controller
             'photos.*'         => ['image', 'max:2048'],
             'testimonials'     => ['nullable', 'array'],
             'testimonials.*'   => ['nullable', 'string'],
+            'reasons'          => ['nullable', 'array'],
+            'reasons.*'        => ['nullable', 'string'],
         ]);
 
         $logoPath = $organization->logo;
@@ -91,6 +97,17 @@ class OrganizationController extends Controller
             'president'        => $validated['president'] ?? null,
             'logo'             => $logoPath,
         ]);
+
+        // Replace reasons
+        $organization->reasons()->delete();
+        foreach (($validated['reasons'] ?? []) as $index => $reason) {
+            if (!empty(trim($reason))) {
+                $organization->reasons()->create([
+                    'reason'      => $reason,
+                    'order_index' => $index,
+                ]);
+            }
+        }
 
         // Replace testimonials
         $organization->testimonials()->delete();

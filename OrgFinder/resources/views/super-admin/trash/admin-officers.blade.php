@@ -20,17 +20,23 @@
         <table>
             <thead>
                 <tr>
-                    <th>Name</th>
-                    <th>Email</th>
-                    <th>Status</th>
+                    <th>Admin No.</th>
+                    <th>Last Name</th>
+                    <th>First Name</th>
+                    <th>Organization</th>
+                    <th>Position</th>
+                    <th style="text-align:center">Status</th>
                     <th style="text-align:center">Action</th>
                 </tr>
             </thead>
             <tbody>
                 @forelse($officers as $officer)
                 <tr>
-                    <td><span style="color:#3b82f6;font-weight:600;">{{ $officer->name }}</span></td>
-                    <td>{{ $officer->email }}</td>
+                    <td><span style="color:#1e3a5c;font-weight:600;">{{ $officer->admin_number }}</span></td>
+                    <td><span style="color:#3b82f6;font-weight:600;">{{ $officer->last_name }}</span></td>
+                    <td><span style="color:#3b82f6;font-weight:600;">{{ $officer->first_name }}</span></td>
+                    <td>{{ $officer->organization }}</td>
+                    <td>{{ $officer->position }}</td>
                     <td><span class="badge badge-danger">Removed</span></td>
                     <td style="text-align:center;">
                         <div style="display:flex;gap:8px;justify-content:center;">
@@ -41,7 +47,7 @@
                 </tr>
                 @empty
                 <tr>
-                    <td colspan="4" style="text-align:center;color:#94a3b8;padding:40px;">No archived admin officers.</td>
+                    <td colspan="7" style="text-align:center;color:#94a3b8;padding:40px;">No archived admin officers.</td>
                 </tr>
                 @endforelse
             </tbody>

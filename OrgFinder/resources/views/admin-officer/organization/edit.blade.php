@@ -130,6 +130,27 @@
                 </div>
             </div>
 
+            {{-- Reasons to Join --}}
+            <div class="card" style="margin-bottom:20px;">
+                <div class="section-title">Reasons to Join</div>
+                <div id="reasonsList">
+                    @forelse($organization->reasons as $reason)
+                    <div class="removable-item">
+                        <textarea name="reasons[]" class="form-control" rows="2" placeholder="Enter a reason to join">{{ old('reasons.'.$loop->index, $reason->reason) }}</textarea>
+                        <button type="button" class="remove-btn" onclick="this.closest('.removable-item').remove()">×</button>
+                    </div>
+                    @empty
+                    <div class="removable-item">
+                        <textarea name="reasons[]" class="form-control" rows="2" placeholder="Enter a reason to join"></textarea>
+                        <button type="button" class="remove-btn" onclick="this.closest('.removable-item').remove()">×</button>
+                    </div>
+                    @endforelse
+                </div>
+                <div style="margin-top:10px;display:flex;justify-content:flex-end;">
+                    <button type="button" class="btn-add" onclick="addReason()">+ Add Reason</button>
+                </div>
+            </div>
+
             {{-- Testimonials --}}
             <div class="card">
                 <div class="section-title">Member / Alumni Testimonials</div>
@@ -184,8 +205,16 @@ function previewNewPhoto(input) {
     const label = input.closest('label');
     const reader = new FileReader();
     reader.onload = e => {
-        label.innerHTML = `<img src="${e.target.result}" style="width:100%;height:100%;object-fit:cover;border-radius:8px;">
-            <input type="file" name="photos[]" accept="image/*" onchange="previewNewPhoto(this)" style="position:absolute;inset:0;opacity:0;cursor:pointer;width:100%;height:100%;">`;
+        // Remove any existing preview, keep the original input intact
+        const existing = label.querySelector('img.slot-preview');
+        if (existing) existing.remove();
+        const svg = label.querySelector('svg');
+        if (svg) svg.style.display = 'none';
+        const img = document.createElement('img');
+        img.src = e.target.result;
+        img.className = 'slot-preview';
+        img.style.cssText = 'position:absolute;inset:0;width:100%;height:100%;object-fit:cover;border-radius:8px;pointer-events:none;';
+        label.appendChild(img);
     };
     reader.readAsDataURL(input.files[0]);
 }
@@ -201,6 +230,16 @@ function addPhotoSlot() {
         </label>
         <button type="button" class="slot-remove" onclick="this.closest('.photo-slot-wrap').remove()">×</button>`;
     grid.appendChild(wrap);
+}
+
+function addReason() {
+    const list = document.getElementById('reasonsList');
+    const div = document.createElement('div');
+    div.className = 'removable-item';
+    div.innerHTML = `
+        <textarea name="reasons[]" class="form-control" rows="2" placeholder="Enter a reason to join"></textarea>
+        <button type="button" class="remove-btn" onclick="this.closest('.removable-item').remove()">×</button>`;
+    list.appendChild(div);
 }
 
 function addTestimonial() {

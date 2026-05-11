@@ -68,14 +68,17 @@
         </div>
 
         {{-- Reasons to Join --}}
-        @if($organization->mission)
+        @if($reasons->count())
         <div class="card" style="margin-bottom:20px;">
             <div style="font-size:15px;font-weight:700;color:#1e2f6e;margin-bottom:12px;">Reasons to Join</div>
-            <ul style="padding-left:18px;font-size:13px;color:#475569;line-height:2;">
-                @foreach(array_filter(explode("\n", $organization->mission)) as $point)
-                    @if(trim($point))
-                        <li>{{ ltrim(trim($point), '-• ') }}</li>
-                    @endif
+            <ul style="padding-left:0;list-style:none;margin:0;">
+                @foreach($reasons as $reason)
+                <li style="display:flex;align-items:flex-start;gap:10px;padding:8px 0;border-bottom:1px solid #f1f5f9;">
+                    <span style="flex-shrink:0;width:22px;height:22px;border-radius:50%;background:#eff6ff;display:flex;align-items:center;justify-content:center;">
+                        <svg width="12" height="12" viewBox="0 0 24 24" fill="#4361EE"><path d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41z"/></svg>
+                    </span>
+                    <span style="font-size:13px;color:#475569;line-height:1.6;">{{ $reason->reason }}</span>
+                </li>
                 @endforeach
             </ul>
         </div>
@@ -107,8 +110,8 @@
                 <div id="eventTrack" style="display:flex;gap:14px;overflow:hidden;scroll-behavior:smooth;">
                     @foreach($eventPosters as $event)
                     <div style="flex:0 0 244px;height:316px;border-radius:12px;overflow:hidden;position:relative;background:#f1f5f9;cursor:pointer;"
-                         onclick="openLightbox('{{ asset('storage/'.$event->poster) }}','{{ addslashes($event->title) }}')">
-                        <img src="{{ asset('storage/'.$event->poster) }}" style="width:100%;height:100%;object-fit:cover;">
+                         onclick="openLightbox('{{ asset('storage/'.$event->event_poster) }}','{{ addslashes($event->title) }}')">
+                        <img src="{{ asset('storage/'.$event->event_poster) }}" style="width:100%;height:100%;object-fit:cover;">
                         <div style="position:absolute;bottom:0;left:0;right:0;padding:10px 12px;background:linear-gradient(transparent,rgba(0,0,0,.55));">
                             <div style="color:#fff;font-size:12px;font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">{{ $event->title }}</div>
                             <div style="color:rgba(255,255,255,.75);font-size:11px;">{{ \Carbon\Carbon::parse($event->date)->format('M j, Y') }}</div>

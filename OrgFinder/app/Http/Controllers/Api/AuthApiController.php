@@ -18,7 +18,7 @@ class AuthApiController extends Controller
             'password' => 'required',
         ]);
 
-        $user = User::where('email', $request->email)->first();
+        $user = User::with('profile')->where('email', $request->email)->first();
 
         if (!$user || !Hash::check($request->password, $user->password)) {
             throw ValidationException::withMessages([
@@ -50,24 +50,28 @@ class AuthApiController extends Controller
 
     public function user(Request $request)
     {
-        return response()->json(['user' => $this->userResource($request->user())]);
+        $user = $request->user()->load('profile');
+
+        return response()->json(['user' => $this->userResource($user)]);
     }
 
     private function userResource(User $user): array
     {
+        $profile = $user->profile;
+
         return [
             'id'                => $user->id,
-            'name'              => $user->name,
+            'first_name'        => $user->first_name,
+            'last_name'         => $user->last_name,
             'email'             => $user->email,
-            'student_number'    => $user->student_number,
-            'year_level'        => $user->year_level,
-            'program'           => $user->program,
-            'interests'         => $user->interests ?? [],
-            'skills'            => $user->skills ?? [],
-            'activities'        => $user->activities ?? [],
-            'profile_completed' => $user->profile_completed,
-            'profile_photo'     => $user->profile_photo
-                ? asset('storage/' . $user->profile_photo)
+            'year_level'        => $profile?->year_level,
+            'program'           => $profile?->program,
+            'interests'         => $profile?->interest ?? [],
+            'skills'            => $profile?->skill_to_improve ?? [],
+            'activities'        => $profile?->preferred_activity ?? [],
+            'profile_completed' => $profile?->profile_completed ?? false,
+            'profile_photo'     => $profile?->profile_photo
+                ? asset('storage/' . $profile->profile_photo)
                 : null,
         ];
     }

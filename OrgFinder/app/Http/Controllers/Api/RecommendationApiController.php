@@ -60,16 +60,22 @@ class RecommendationApiController extends Controller
     {
         $user = $request->user();
 
+        $user->loadMissing('profile');
+        $userProgram    = $user->profile?->program;
+        $userInterests  = $user->profile?->interest ?? [];
+        $userSkills     = $user->profile?->skill_to_improve ?? [];
+        $userActivities = $user->profile?->preferred_activity ?? [];
+
         $orgs = Organization::with(['photos'])
             ->whereNull('deleted_at')
             ->get()
-            ->filter(function ($org) use ($user) {
+            ->filter(function ($org) use ($userProgram) {
                 $eligible = $org->eligible_programs;
-                return empty($eligible) || in_array($user->program, $eligible);
+                return empty($eligible) || in_array($userProgram, $eligible);
             });
 
-        $scored = $orgs->map(function ($org) use ($user) {
-            [$score, $matchedTags] = $this->scoreOrg($org, $user);
+        $scored = $orgs->map(function ($org) use ($userInterests, $userSkills, $userActivities, $userProgram) {
+            [$score, $matchedTags] = $this->scoreOrg($org, $userInterests, $userSkills, $userActivities, $userProgram);
             return [
                 'org'         => $org,
                 'score'       => $score,
@@ -87,60 +93,48 @@ class RecommendationApiController extends Controller
         ]);
     }
 
-    private function scoreOrg(Organization $org, $user): array
+    private function scoreOrg(Organization $org, array $interests, array $skills, array $activities, ?string $program): array
     {
-        $score      = 0;
+        $score       = 0;
         $matchedTags = [];
 
-        // category is now a JSON array; support legacy single-string too
         $orgCategories = array_map('strtolower', (array) ($org->category ?? []));
         $orgCategories = array_filter($orgCategories);
 
         if (empty($orgCategories)) return [0, []];
 
-        // Interests → 3 pts each (match if ANY org category qualifies)
-        foreach (($user->interests ?? []) as $interest) {
+        foreach ($interests as $interest) {
             $cats = array_map('strtolower', self::INTEREST_MAP[$interest] ?? []);
             foreach ($orgCategories as $orgCat) {
                 if (in_array($orgCat, $cats) || $this->partialMatch($orgCat, $cats)) {
-                    $score += 3;
-                    $matchedTags[] = $interest;
-                    break;
+                    $score += 3; $matchedTags[] = $interest; break;
                 }
             }
         }
 
-        // Skills → 2 pts each
-        foreach (($user->skills ?? []) as $skill) {
+        foreach ($skills as $skill) {
             $cats = array_map('strtolower', self::SKILL_MAP[$skill] ?? []);
             foreach ($orgCategories as $orgCat) {
                 if (in_array($orgCat, $cats) || $this->partialMatch($orgCat, $cats)) {
-                    $score += 2;
-                    $matchedTags[] = $skill;
-                    break;
+                    $score += 2; $matchedTags[] = $skill; break;
                 }
             }
         }
 
-        // Activities → 1 pt each
-        foreach (($user->activities ?? []) as $activity) {
+        foreach ($activities as $activity) {
             $cats = array_map('strtolower', self::ACTIVITY_MAP[$activity] ?? []);
             foreach ($orgCategories as $orgCat) {
                 if (in_array($orgCat, $cats) || $this->partialMatch($orgCat, $cats)) {
-                    $score += 1;
-                    $matchedTags[] = $activity;
-                    break;
+                    $score += 1; $matchedTags[] = $activity; break;
                 }
             }
         }
 
-        // Program bonus → +1 pt if ANY org category aligns with program
-        $programCats = array_map('strtolower', self::PROGRAM_MAP[$user->program ?? ''] ?? []);
+        $programCats = array_map('strtolower', self::PROGRAM_MAP[$program ?? ''] ?? []);
         if (!empty($programCats)) {
             foreach ($orgCategories as $orgCat) {
                 if (in_array($orgCat, $programCats) || $this->partialMatch($orgCat, $programCats)) {
-                    $score += 1;
-                    break;
+                    $score += 1; break;
                 }
             }
         }
@@ -176,7 +170,7 @@ class RecommendationApiController extends Controller
 
         return [
             'id'           => $org->id,
-            'name'         => $org->name,
+            'name'         => $org->org_name,
             'category'     => $org->category,
             'president'    => $org->president,
             'mission'      => $org->mission,

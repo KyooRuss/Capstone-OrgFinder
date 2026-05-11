@@ -39,13 +39,30 @@ class TrashController extends Controller
 
     public function adminOfficers(Request $request)
     {
-        $query = User::onlyTrashed()->where('role', 'admin_officer');
+        $query = User::onlyTrashed()
+            ->where('role', 'admin_officer')
+            ->with(['organizationAccess.organization']);
 
         if ($request->filled('search')) {
-            $query->where('name', 'like', '%' . $request->search . '%');
+            $query->where(function ($q) use ($request) {
+                $q->where('name', 'like', '%' . $request->search . '%')
+                  ->orWhere('email', 'like', '%' . $request->search . '%');
+            });
         }
 
-        $officers = $query->latest('deleted_at')->get();
+        $officers = $query->latest('deleted_at')->get()->map(function ($user, $index) {
+            $access = $user->organizationAccess->first();
+            return (object) [
+                'id'           => $user->id,
+                'name'         => $user->name,
+                'last_name'    => $user->last_name,
+                'first_name'   => $user->first_name,
+                'email'        => $user->email,
+                'admin_number' => 'A' . str_pad($index + 1, 4, '0', STR_PAD_LEFT),
+                'organization' => $access?->organization?->org_name ?? '—',
+                'position'     => $access?->position ?? '—',
+            ];
+        });
 
         return view('super-admin.trash.admin-officers', compact('officers'));
     }
