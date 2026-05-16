@@ -23,8 +23,9 @@ class MemberController extends Controller
             return view('admin-officer.members.index', ['members' => collect(), 'org' => null]);
         }
 
-        $query = User::whereHas('organizationAccess', fn($q) => $q->where('organization_id', $org->id))
-            ->where('role', 'student');
+        $query = User::whereHas('organizationAccess', fn($q) => $q
+            ->where('organization_id', $org->id)
+            ->where('position', 'Member'));
 
         if ($request->filled('search')) {
             $query->where(function ($q) use ($request) {

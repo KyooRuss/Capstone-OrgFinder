@@ -21,6 +21,7 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::post('/profile/photo', [ProfileApiController::class, 'uploadPhoto']);
 
     Route::get('/organizations', [OrganizationApiController::class, 'index']);
+    Route::get('/organizations/recruiting', [OrganizationApiController::class, 'recruiting']);
     Route::get('/organizations/{id}', [OrganizationApiController::class, 'show']);
 
     Route::get('/events/upcoming', [EventApiController::class, 'upcoming']);

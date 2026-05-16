@@ -10,7 +10,6 @@ use App\Http\Controllers\AdminOfficer\AuthController as AdminOfficerAuthControll
 use App\Http\Controllers\AdminOfficer\OrganizationController as AdminOfficerOrgController;
 use App\Http\Controllers\AdminOfficer\EventController as AdminOfficerEventController;
 use App\Http\Controllers\AdminOfficer\MemberController;
-use App\Http\Controllers\AdminOfficer\OfficerController;
 use App\Http\Controllers\AdminOfficer\RecruitmentController;
 use App\Http\Controllers\AdminOfficer\TrashController as AdminOfficerTrashController;
 use Illuminate\Support\Facades\Route;
@@ -109,6 +108,7 @@ Route::prefix('admin-officer')->name('admin-officer.')->group(function () {
             Route::get('/', [AdminOfficerEventController::class, 'index'])->name('index');
             Route::get('/{event}', [AdminOfficerEventController::class, 'show'])->name('show');
             Route::post('/', [AdminOfficerEventController::class, 'store'])->name('store');
+            Route::put('/{event}', [AdminOfficerEventController::class, 'update'])->name('update');
             Route::delete('/{event}', [AdminOfficerEventController::class, 'destroy'])->name('destroy');
         });
 
@@ -121,24 +121,14 @@ Route::prefix('admin-officer')->name('admin-officer.')->group(function () {
         Route::prefix('members')->name('members.')->group(function () {
             Route::get('/', [MemberController::class, 'index'])->name('index');
             Route::post('/', [MemberController::class, 'store'])->name('store');
-            Route::post('/{user}/make-officer', [MemberController::class, 'makeOfficer'])->name('make-officer');
             Route::post('/{user}/block', [MemberController::class, 'block'])->name('block');
             Route::post('/{user}/unblock', [MemberController::class, 'unblock'])->name('unblock');
             Route::delete('/{user}', [MemberController::class, 'destroy'])->name('destroy');
         });
 
-        // Officers
-        Route::prefix('officers')->name('officers.')->group(function () {
-            Route::get('/', [OfficerController::class, 'index'])->name('index');
-            Route::post('/{user}/block', [OfficerController::class, 'block'])->name('block');
-            Route::post('/{user}/unblock', [OfficerController::class, 'unblock'])->name('unblock');
-            Route::delete('/{user}', [OfficerController::class, 'destroy'])->name('destroy');
-        });
-
         // Trash
         Route::prefix('trash')->name('trash.')->group(function () {
             Route::get('/members', [AdminOfficerTrashController::class, 'members'])->name('members');
-            Route::get('/officers', [AdminOfficerTrashController::class, 'officers'])->name('officers');
             Route::post('/users/{user}/restore', [AdminOfficerTrashController::class, 'restoreUser'])->name('users.restore');
             Route::delete('/users/{user}', [AdminOfficerTrashController::class, 'forceDeleteUser'])->name('users.force-delete');
         });

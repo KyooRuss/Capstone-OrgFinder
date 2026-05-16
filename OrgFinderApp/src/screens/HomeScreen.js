@@ -2,7 +2,7 @@ import React, { useState, useEffect, useContext, useCallback } from 'react';
 import {
     View, Text, TouchableOpacity, StyleSheet,
     FlatList, Image, ActivityIndicator, RefreshControl,
-    useWindowDimensions,
+    ScrollView, useWindowDimensions,
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { LinearGradient } from 'expo-linear-gradient';
@@ -15,9 +15,10 @@ const CHAR_SURPRISED = require('../../assets/character/surprised.png');
 
 export default function HomeScreen({ navigation }) {
     const { user } = useContext(AuthContext);
-    const [recs, setRecs]             = useState([]);
-    const [loading, setLoading]       = useState(true);
-    const [refreshing, setRefreshing] = useState(false);
+    const [recs, setRecs]               = useState([]);
+    const [recruiting, setRecruiting]   = useState([]);
+    const [loading, setLoading]         = useState(true);
+    const [refreshing, setRefreshing]   = useState(false);
     const [latestEvent, setLatestEvent] = useState(null);
 
     const { width } = useWindowDimensions();
@@ -25,15 +26,19 @@ export default function HomeScreen({ navigation }) {
 
     const firstName = user?.first_name?.split(' ')[0] ?? 'Student';
 
-    const loadRecs = useCallback(async () => {
+    const loadData = useCallback(async () => {
         try {
-            const res = await api.get('/recommendations');
-            setRecs(res.data.recommendations);
+            const [recRes, recruitRes] = await Promise.all([
+                api.get('/recommendations'),
+                api.get('/organizations/recruiting'),
+            ]);
+            setRecs(recRes.data.recommendations);
+            setRecruiting(recruitRes.data.recruiting ?? []);
         } catch {}
         finally { setLoading(false); setRefreshing(false); }
     }, []);
 
-    useEffect(() => { loadRecs(); }, []);
+    useEffect(() => { loadData(); }, []);
 
     const getMatchColor = (pct) => {
         if (pct >= 70) return '#16a34a';
@@ -155,11 +160,6 @@ export default function HomeScreen({ navigation }) {
 
             {/* Recommendations */}
             <View style={styles.body}>
-                <View style={styles.recHeader}>
-                    <Text style={styles.recTitle}>Recommended Orgs</Text>
-                    <Text style={styles.recSub}>Based on your interests & hobbies</Text>
-                </View>
-
                 {loading ? (
                     <ActivityIndicator style={{ marginTop: 40 }} color="#4A6CF7" size="large" />
                 ) : (
@@ -172,9 +172,43 @@ export default function HomeScreen({ navigation }) {
                         refreshControl={
                             <RefreshControl
                                 refreshing={refreshing}
-                                onRefresh={() => { setRefreshing(true); loadRecs(); }}
+                                onRefresh={() => { setRefreshing(true); loadData(); }}
                                 colors={['#4A6CF7']}
                             />
+                        }
+                        ListHeaderComponent={
+                            <>
+                                {recruiting.length > 0 && (
+                                    <View style={styles.recruitSection}>
+                                        <View style={styles.recruitSectionHeader}>
+                                            <Text style={styles.recruitTitle}>Now Recruiting</Text>
+                                            <Text style={styles.recruitSub}>Organizations open for Membership</Text>
+                                        </View>
+                                        <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={styles.recruitList}>
+                                            {recruiting.map(org => (
+                                                <TouchableOpacity
+                                                    key={org.id}
+                                                    style={styles.recruitItem}
+                                                    onPress={() => navigation.navigate('OrgDetail', { id: org.id })}
+                                                    activeOpacity={0.75}
+                                                >
+                                                    {org.logo
+                                                        ? <Image source={{ uri: org.logo }} style={styles.recruitAvatar} />
+                                                        : <View style={[styles.recruitAvatar, styles.recruitAvatarFallback]}>
+                                                            <Text style={styles.recruitAvatarText}>{org.name?.[0] ?? 'O'}</Text>
+                                                          </View>
+                                                    }
+                                                    <Text style={styles.recruitName} numberOfLines={2}>{org.name}</Text>
+                                                </TouchableOpacity>
+                                            ))}
+                                        </ScrollView>
+                                    </View>
+                                )}
+                                <View style={styles.recHeader}>
+                                    <Text style={styles.recTitle}>Recommended Orgs</Text>
+                                    <Text style={styles.recSub}>Based on your interests & hobbies</Text>
+                                </View>
+                            </>
                         }
                         ListEmptyComponent={
                             <View style={styles.empty}>
@@ -280,6 +314,18 @@ const styles = StyleSheet.create({
         marginTop: 6,
         textDecorationLine: 'underline',
     },
+
+    // Now Recruiting
+    recruitSection: { marginBottom: 4 },
+    recruitSectionHeader: { paddingHorizontal: 20, paddingTop: 20, paddingBottom: 8 },
+    recruitTitle: { fontSize: 18, fontWeight: '800', color: '#1e2f6e' },
+    recruitSub: { fontSize: 12, color: '#94a3b8', marginTop: 2 },
+    recruitList: { paddingHorizontal: 16, paddingBottom: 4, gap: 16 },
+    recruitItem: { alignItems: 'center', width: 64 },
+    recruitAvatar: { width: 60, height: 60, borderRadius: 30, marginBottom: 6 },
+    recruitAvatarFallback: { backgroundColor: '#4A6CF7', alignItems: 'center', justifyContent: 'center' },
+    recruitAvatarText: { color: '#fff', fontSize: 22, fontWeight: '700' },
+    recruitName: { fontSize: 11, fontWeight: '600', color: '#1e2f6e', textAlign: 'center' },
 
     // Body
     body: { flex: 1 },

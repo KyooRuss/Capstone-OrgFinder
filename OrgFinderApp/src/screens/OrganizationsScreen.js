@@ -6,6 +6,7 @@ import {
 } from 'react-native';
 import { LinearGradient } from 'expo-linear-gradient';
 import { SafeAreaView } from 'react-native-safe-area-context';
+import { Ionicons } from '@expo/vector-icons';
 import api from '../api/client';
 
 const CATEGORIES = [
@@ -77,7 +78,7 @@ export default function OrganizationsScreen({ navigation }) {
 
                     <View style={styles.searchRow}>
                         <View style={styles.searchWrap}>
-                            <Text style={styles.searchIcon}>🔍</Text>
+                            <Ionicons name="search-outline" size={18} color="#aaa" style={styles.searchIcon} />
                             <TextInput
                                 style={styles.searchInput}
                                 placeholder="Search Organization..."
@@ -153,7 +154,7 @@ const styles = StyleSheet.create({
         flex: 1, flexDirection: 'row', alignItems: 'center',
         backgroundColor: '#fff', borderRadius: 12, paddingHorizontal: 14, height: 46,
     },
-    searchIcon: { fontSize: 16, marginRight: 8 },
+    searchIcon: { marginRight: 6 },
     searchInput: { flex: 1, fontSize: 14, color: '#333' },
     catBtn: {
         backgroundColor: '#fff', borderRadius: 12, height: 46,

@@ -6,6 +6,7 @@ import {
 } from 'react-native';
 import { LinearGradient } from 'expo-linear-gradient';
 import { SafeAreaView } from 'react-native-safe-area-context';
+import { Ionicons } from '@expo/vector-icons';
 import { AuthContext } from '../context/AuthContext';
 import api from '../api/client';
 
@@ -77,7 +78,6 @@ export default function OrgDetailScreen({ route, navigation }) {
                         <SafeAreaView>
                             <TouchableOpacity onPress={() => navigation.goBack()} style={styles.backBtn}>
                                 <Text style={styles.backIcon}>‹</Text>
-                                <Text style={styles.backLabel}>{org.name}</Text>
                             </TouchableOpacity>
                         </SafeAreaView>
 
@@ -85,7 +85,7 @@ export default function OrgDetailScreen({ route, navigation }) {
                             {org.logo
                                 ? <Image source={{ uri: org.logo }} style={[styles.heroLogo, { width: logoSize, height: logoSize, borderRadius: logoSize / 2 }]} />
                                 : <View style={[styles.heroLogo, styles.heroLogoFallback, { width: logoSize, height: logoSize, borderRadius: logoSize / 2 }]}>
-                                    <Text style={[styles.heroLogoText, { fontSize: Math.round(logoSize * 0.38) }]}>{org.name?.[0] ?? 'O'}</Text>
+                                    <Ionicons name="business" size={Math.round(logoSize * 0.45)} color="#fff" />
                                   </View>
                             }
                             <View style={styles.heroTextBlock}>
@@ -204,10 +204,25 @@ export default function OrgDetailScreen({ route, navigation }) {
                     {/* Footer contact info */}
                     {(org.room_number || org.contact_telegram || org.contact_facebook) && (
                         <View style={styles.footer}>
-                            <View style={styles.footerRow}>
-                                {org.room_number && <Text style={styles.footerItem}>📍 {org.room_number}</Text>}
-                                {org.contact_telegram && <Text style={styles.footerItem}>📱 {org.contact_telegram}</Text>}
-                                {org.contact_facebook && <Text style={styles.footerItem}>👤 {org.contact_facebook}</Text>}
+                            <View style={styles.footerGrid}>
+                                {org.room_number && (
+                                    <View style={styles.footerItem}>
+                                        <Ionicons name="location-outline" size={15} color="rgba(255,255,255,0.75)" />
+                                        <Text style={styles.footerText}>{org.room_number}</Text>
+                                    </View>
+                                )}
+                                {org.contact_facebook && (
+                                    <View style={styles.footerItem}>
+                                        <Ionicons name="person-outline" size={15} color="rgba(255,255,255,0.75)" />
+                                        <Text style={styles.footerText}>{org.contact_facebook}</Text>
+                                    </View>
+                                )}
+                                {org.contact_telegram && (
+                                    <View style={styles.footerItem}>
+                                        <Ionicons name="call-outline" size={15} color="rgba(255,255,255,0.75)" />
+                                        <Text style={styles.footerText}>{org.contact_telegram}</Text>
+                                    </View>
+                                )}
                             </View>
                         </View>
                     )}
@@ -320,7 +335,6 @@ const styles = StyleSheet.create({
     },
     heroLogo: { borderWidth: 3, borderColor: 'rgba(255,255,255,0.5)' },
     heroLogoFallback: { backgroundColor: 'rgba(255,255,255,0.25)', alignItems: 'center', justifyContent: 'center' },
-    heroLogoText: { color: '#fff', fontWeight: '700' },
     heroTextBlock: { flex: 1 },
     heroName: { fontSize: 20, fontWeight: '800', color: '#fff', marginBottom: 4 },
     heroPresident: { fontSize: 13, color: 'rgba(255,255,255,0.75)', fontStyle: 'italic' },
@@ -360,11 +374,17 @@ const styles = StyleSheet.create({
     coreLabel: { fontSize: 15, fontWeight: '700', color: '#1e2f6e', marginBottom: 6, marginTop: 8 },
     coreText: { fontSize: 14, color: '#555', lineHeight: 21 },
     footer: {
-        alignItems: 'center', backgroundColor: '#1e2f6e',
+        backgroundColor: '#1e2f6e',
         borderRadius: 14, padding: 16, marginBottom: 20,
     },
-    footerRow: { flexDirection: 'row', flexWrap: 'wrap', gap: 25 },
-    footerItem: { color: 'rgba(255,255,255,0.8)', fontSize: 12 },
+    footerGrid: {
+        flexDirection: 'row', flexWrap: 'wrap', gap: 14,
+    },
+    footerItem: {
+        flexDirection: 'row', alignItems: 'center', gap: 6,
+        width: '45%',
+    },
+    footerText: { color: 'rgba(255,255,255,0.85)', fontSize: 12, flex: 1 },
 
     // Recruit badge + join button
     recruitRow: { flexDirection: 'row', alignItems: 'center', gap: 8, marginTop: 8, flexWrap: 'wrap' },

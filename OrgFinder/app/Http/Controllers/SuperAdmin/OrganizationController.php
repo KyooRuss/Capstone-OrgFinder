@@ -5,6 +5,7 @@ namespace App\Http\Controllers\SuperAdmin;
 use App\Http\Controllers\Controller;
 use App\Models\Organization;
 use App\Models\OrganizationAccess;
+use App\Models\OrganizationPhoto;
 use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Storage;
@@ -164,6 +165,17 @@ class OrganizationController extends Controller
             }
         }
 
+        // Delete photos marked for removal
+        if ($request->filled('delete_photos')) {
+            $photosToDelete = OrganizationPhoto::whereIn('id', $request->input('delete_photos'))
+                ->where('organization_id', $organization->id)
+                ->get();
+            foreach ($photosToDelete as $photo) {
+                Storage::disk('public')->delete($photo->photo_path);
+                $photo->delete();
+            }
+        }
+
         // Add new photos (keep existing)
         if ($request->hasFile('photos')) {
             $existingCount = $organization->photos()->count();
@@ -201,7 +213,7 @@ class OrganizationController extends Controller
             'email'    => ['required', 'email', 'exists:users,email'],
             'last_name' => ['nullable', 'string'],
             'first_name' => ['nullable', 'string'],
-            'position' => ['required', 'string', 'max:100'],
+            'position' => ['required', 'in:Organization Adviser,Organization President'],
         ]);
 
         $user = User::where('email', $validated['email'])->firstOrFail();

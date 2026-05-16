@@ -1,14 +1,21 @@
 @php
 $categoryList = [
-    'Sign Language','Community','Educational','Non-Academic','Mental Health',
-    'Guidance & Counseling','Mental First Aid','Performing Arts','Recording & Production',
-    'Music Publishing','Creative Services','Audio & Audiovisual Media','Leadership',
-    'Communication','Service','Discipline','Creative','Photography','Photo & Video Editing',
-    'Entertainment','Media Production','Singing / Vocal Performance','Music Collaboration',
-    'Technology','Research','Innovation','E-Sports','Gaming','Competition','Team Strategy',
-    'Academic Organization','Programming','Software Development','Information Technology',
+    // Arts & Culture
+    'Arts & Design','Creative','Creative Services','Multimedia','Performing Arts',
+    'Photography','Photo & Video Editing','Media Production','Entertainment',
+    'Singing','Music Publishing','Music Collaboration',
+    'Recording & Production','Audio & Audiovisual Media','Dancing','Choreography',
+    // Technology
+    'Technology','Programming','Software Development','Information Technology',
     'Systems & Networking','Information Systems','Business & Technology Integration',
-    'Multimedia','Arts & Design',
+    'Research','Innovation','Academic Organization',
+    // Gaming & Competition
+    'Gaming','E-Sports','Competition','Team Strategy',
+    // Leadership & Service
+    'Leadership','Communication','Service','Community','Discipline','Educational',
+    'Guidance & Counseling','Mental Health','Mental First Aid','Sign Language',
+    // Other
+    'Non-Academic',
 ];
 $selectedCategories = $selectedCategories ?? [];
 @endphp

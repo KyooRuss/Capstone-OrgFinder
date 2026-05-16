@@ -111,15 +111,8 @@
                 <label style="font-size:13px;font-weight:600;color:#374151;display:block;margin-bottom:8px;">Position</label>
                 <select id="grantPosition" style="width:100%;border:1.5px solid #e2e8f0;border-radius:8px;padding:10px 14px;font-size:14px;color:#374151;background:#f8fafc;outline:none;">
                     <option value="">Select a position</option>
-                    <option>President</option>
-                    <option>Vice President</option>
-                    <option>Secretary</option>
-                    <option>Treasurer</option>
-                    <option>Auditor</option>
-                    <option>Public Relations Officer</option>
-                    <option>Business Manager</option>
-                    <option>Representative</option>
-                    <option>Member</option>
+                    <option>Organization Adviser</option>
+                    <option>Organization President</option>
                 </select>
             </div>
 

@@ -94,7 +94,7 @@ export default function EventsScreen({ navigation }) {
                     </View>
                     <View style={styles.searchRow}>
                         <View style={styles.searchWrap}>
-                            <Text style={styles.searchIcon}>🔍</Text>
+                            <Ionicons name="search-outline" size={18} color="#aaa" style={styles.searchIcon} />
                             <TextInput
                                 style={styles.searchInput}
                                 placeholder="Search Event..."
@@ -178,7 +178,7 @@ const styles = StyleSheet.create({
         flex: 1, flexDirection: 'row', alignItems: 'center',
         backgroundColor: '#fff', borderRadius: 12, paddingHorizontal: 14, height: 46,
     },
-    searchIcon: { fontSize: 16, marginRight: 8 },
+    searchIcon: { marginRight: 6 },
     searchInput: { flex: 1, fontSize: 14, color: '#333' },
     filterBtn: {
         backgroundColor: '#fff', borderRadius: 12, height: 46,

@@ -4,6 +4,7 @@ namespace App\Http\Controllers\AdminOfficer;
 
 use App\Http\Controllers\Controller;
 use App\Models\MembershipRequest;
+use App\Models\OrganizationAccess;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 
@@ -56,6 +57,16 @@ class RecruitmentController extends Controller
         $request->validate(['status' => ['required', 'in:accepted,declined']]);
 
         $membershipRequest->update(['status' => $request->status]);
+
+        if ($request->status === 'accepted') {
+            OrganizationAccess::firstOrCreate(
+                [
+                    'organization_id' => $org->id,
+                    'user_id'         => $membershipRequest->user_id,
+                ],
+                ['position' => 'Member']
+            );
+        }
 
         return back()->with('success', 'Application status updated.');
     }

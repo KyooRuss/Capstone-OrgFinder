@@ -52,13 +52,14 @@
                     <td><span class="td-no">E{{ str_pad($i + 1, 4, '0', STR_PAD_LEFT) }}</span></td>
                     <td><span class="td-name" onclick="viewEvent({{ $event->id }})">{{ $event->title }}</span></td>
                     <td>{{ \Carbon\Carbon::parse($event->date)->format('n-d-Y') }}</td>
-                    <td>{{ $event->date->format('m-d-Y') }}</td>
+                    <td>{{ $event->time ? date('g:i A', strtotime($event->time)) : '—' }}</td>
                     <td>{{ $event->venue }}</td>
                     <td style="text-align:center">
                         <span class="status-{{ $event->status }}">{{ ucfirst($event->status) }}</span>
                     </td>
                     <td style="text-align:center">
                         <button class="btn btn-dark btn-sm-pill" onclick="viewEvent({{ $event->id }})">View Details</button>
+                        <button class="btn btn-sm-pill" style="background:#f1f5f9;color:#475569;margin-left:6px;" onclick="editEvent({{ $event->id }})">Edit</button>
                     </td>
                 </tr>
                 @empty
@@ -152,12 +153,57 @@
         </div>
     </div>
 </div>
+{{-- Edit Event Modal --}}
+<div class="modal-overlay" id="editEventModal">
+    <div class="modal modal-wide">
+        <button class="modal-close" onclick="closeModal('editEventModal'); selectedEditImageFile = null;">×</button>
+        <div style="display:flex;gap:24px;">
+            <div class="event-image-box upload-box" id="editUploadBox" onclick="document.getElementById('editEventImageInput').click()">
+                <svg width="40" height="40" viewBox="0 0 24 24" fill="#aaa"><path d="M21 19V5c0-1.1-.9-2-2-2H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2zM8.5 13.5l2.5 3.01L14.5 12l4.5 6H5l3.5-4.5z"/></svg>
+                <svg width="22" height="22" viewBox="0 0 24 24" fill="#aaa" style="margin-top:-10px;"><path d="M19 13h-6v6h-2v-6H5v-2h6V5h2v6h6v2z"/></svg>
+                <input type="file" id="editEventImageInput" accept="image/*" style="display:none;" onchange="previewEditImage(this)">
+            </div>
+            <div style="flex:1;">
+                <div class="modal-title">Edit Event</div>
+                <form id="editEventForm">
+                    @csrf
+                    <input type="hidden" id="editEventId">
+                    <div class="form-group">
+                        <input type="text" id="editTitle" name="title" class="form-control" placeholder="Enter event title" required>
+                    </div>
+                    <div style="display:flex;gap:10px;margin-bottom:14px;">
+                        <div style="flex:1;">
+                            <input type="date" id="editDate" name="date" class="form-control" required>
+                        </div>
+                        <div style="flex:1;">
+                            <input type="time" id="editTime" name="time" class="form-control">
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <input type="text" id="editVenue" name="venue" class="form-control" placeholder="Enter venue / location">
+                    </div>
+                    <div class="form-group">
+                        <textarea id="editDescription" name="description" class="form-control" rows="3" placeholder="About This Event" style="resize:none;"></textarea>
+                    </div>
+                    <div class="form-group">
+                        <textarea id="editBenefits" name="benefits" class="form-control" rows="3" placeholder="What you will gain (one per line)" style="resize:none;"></textarea>
+                    </div>
+                    <div id="editEventError" style="color:#ef4444;font-size:12px;margin-bottom:8px;display:none;"></div>
+                    <div style="text-align:right;">
+                        <button type="submit" class="btn btn-primary">Save Changes</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
 @endsection
 
 @push('scripts')
 <script>
 const statusColors = { pending: '#e96500', approved: '#0f9800', rejected: '#eb3223' };
 let selectedImageFile = null;
+let selectedEditImageFile = null;
 
 function viewEvent(id) {
     fetch(`/admin-officer/events/${id}`, { headers: { 'Accept': 'application/json' } })
@@ -210,6 +256,69 @@ document.getElementById('createEventForm').addEventListener('submit', function(e
         }
     });
 });
+
+function editEvent(id) {
+    fetch(`/admin-officer/events/${id}`, { headers: { 'Accept': 'application/json' } })
+        .then(r => r.json())
+        .then(data => {
+            document.getElementById('editEventId').value = data.id;
+            document.getElementById('editTitle').value = data.title;
+            document.getElementById('editDate').value = data.date_raw || '';
+            document.getElementById('editTime').value = data.time_raw || '';
+            document.getElementById('editVenue').value = data.venue || '';
+            document.getElementById('editDescription').value = data.description || '';
+            document.getElementById('editBenefits').value = data.benefits || '';
+            selectedEditImageFile = null;
+            const box = document.getElementById('editUploadBox');
+            box.innerHTML = data.image_url
+                ? `<img src="${data.image_url}" style="width:100%;height:100%;object-fit:cover;border-radius:12px;">
+                   <input type="file" id="editEventImageInput" accept="image/*" style="display:none;" onchange="previewEditImage(this)">`
+                : `<svg width="40" height="40" viewBox="0 0 24 24" fill="#aaa"><path d="M21 19V5c0-1.1-.9-2-2-2H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2zM8.5 13.5l2.5 3.01L14.5 12l4.5 6H5l3.5-4.5z"/></svg>
+                   <svg width="22" height="22" viewBox="0 0 24 24" fill="#aaa" style="margin-top:-10px;"><path d="M19 13h-6v6h-2v-6H5v-2h6V5h2v6h6v2z"/></svg>
+                   <input type="file" id="editEventImageInput" accept="image/*" style="display:none;" onchange="previewEditImage(this)">`;
+            document.getElementById('editEventError').style.display = 'none';
+            openModal('editEventModal');
+        });
+}
+
+document.getElementById('editEventForm').addEventListener('submit', function(e) {
+    e.preventDefault();
+    const errEl = document.getElementById('editEventError');
+    errEl.style.display = 'none';
+    const id = document.getElementById('editEventId').value;
+    const formData = new FormData(this);
+    formData.append('_method', 'PUT');
+    if (selectedEditImageFile) formData.append('image', selectedEditImageFile);
+
+    fetch(`/admin-officer/events/${id}`, {
+        method: 'POST',
+        headers: { 'X-CSRF-TOKEN': csrfToken(), 'Accept': 'application/json' },
+        body: formData
+    })
+    .then(r => r.json())
+    .then(data => {
+        if (data.success) {
+            closeModal('editEventModal');
+            location.reload();
+        } else {
+            errEl.textContent = data.message || 'Something went wrong.';
+            errEl.style.display = 'block';
+        }
+    });
+});
+
+function previewEditImage(input) {
+    if (input.files && input.files[0]) {
+        selectedEditImageFile = input.files[0];
+        const reader = new FileReader();
+        reader.onload = e => {
+            document.getElementById('editUploadBox').innerHTML =
+                `<img src="${e.target.result}" style="width:100%;height:100%;object-fit:cover;border-radius:12px;">
+                 <input type="file" id="editEventImageInput" accept="image/*" style="display:none;" onchange="previewEditImage(this)">`;
+        };
+        reader.readAsDataURL(input.files[0]);
+    }
+}
 
 function previewImage(input) {
     if (input.files && input.files[0]) {

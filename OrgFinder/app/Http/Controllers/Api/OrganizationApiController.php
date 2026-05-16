@@ -16,15 +16,39 @@ class OrganizationApiController extends Controller
         'Gaming'                  => ['Gaming', 'E-Sports', 'Competition', 'Team Strategy', 'Entertainment'],
         'Design'                  => ['Arts & Design', 'Creative', 'Creative Services', 'Multimedia', 'Photography', 'Photo & Video Editing'],
         'Animation'               => ['Multimedia', 'Creative Services', 'Arts & Design', 'Creative', 'Media Production', 'Recording & Production', 'Audio & Audiovisual Media'],
-        'Music'                   => ['Music Publishing', 'Singing / Vocal Performance', 'Music Collaboration', 'Recording & Production', 'Performing Arts', 'Audio & Audiovisual Media', 'Entertainment', 'Creative Services', 'Media Production'],
+        'Music'                   => ['Music Publishing', 'Singing', 'Music Collaboration', 'Recording & Production', 'Performing Arts', 'Audio & Audiovisual Media', 'Entertainment', 'Dancing', 'Choreography', 'Media Production'],
         'Cyber Security'          => ['Information Technology', 'Systems & Networking', 'Technology', 'Information Systems'],
         'Artificial Intelligence' => ['Technology', 'Research', 'Information Technology', 'Academic Organization', 'Innovation'],
         'Analytics'               => ['Research', 'Academic Organization', 'Technology', 'Information Technology'],
-        'Machine Learning'        => ['Technology', 'Research', 'Academic Organization', 'Innovation'],
         'Innovation'              => ['Innovation', 'Research', 'Technology', 'Business & Technology Integration', 'Academic Organization'],
         'Leadership'              => ['Leadership', 'Communication', 'Service', 'Community', 'Discipline', 'Academic Organization', 'Educational'],
         'Sports'                  => ['Competition', 'Team Strategy', 'E-Sports', 'Gaming', 'Service', 'Discipline'],
     ];
+
+    public function recruiting(Request $request)
+    {
+        $user        = $request->user();
+        $userProgram = $user->profile?->program;
+
+        $orgs = Organization::with(['photos'])
+            ->whereNull('deleted_at')
+            ->where('is_recruiting', true)
+            ->orderBy('org_name')
+            ->get()
+            ->filter(function ($org) use ($userProgram) {
+                $eligible = $org->eligible_programs;
+                return empty($eligible) || in_array($userProgram, $eligible);
+            })->values();
+
+        return response()->json([
+            'recruiting' => $orgs->map(fn($o) => [
+                'id'       => $o->id,
+                'name'     => $o->org_name,
+                'category' => $o->category,
+                'logo'     => $o->logo ? asset('storage/' . $o->logo) : null,
+            ]),
+        ]);
+    }
 
     public function index(Request $request)
     {

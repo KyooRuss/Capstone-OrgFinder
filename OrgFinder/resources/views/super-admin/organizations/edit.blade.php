@@ -104,9 +104,9 @@
                     </div>
 
                     <div style="flex:1;">
-                        <input type="text" name="name" class="form-control"
+                        <input type="text" name="org_name" class="form-control"
                                placeholder="Enter the organization name"
-                               value="{{ old('name', $organization->name) }}"
+                               value="{{ old('org_name', $organization->org_name) }}"
                                required style="margin-bottom:10px;">
                         @include('super-admin.partials.category-select', ['selectedCategories' => old('categories', $organization->category ?? [])])
                         <div style="margin-top:10px;">
@@ -257,15 +257,21 @@ function addPhotoSlot() {
 }
 
 function previewNewPhoto(input) {
-    if (input.files && input.files[0]) {
-        const reader = new FileReader();
-        reader.onload = e => {
-            const label = input.closest('label');
-            label.innerHTML = `<img src="${e.target.result}" style="position:absolute;inset:0;width:100%;height:100%;object-fit:cover;">
-                <input type="file" name="photos[]" accept="image/*" onchange="previewNewPhoto(this)" style="position:absolute;inset:0;opacity:0;cursor:pointer;width:100%;height:100%;">`;
-        };
-        reader.readAsDataURL(input.files[0]);
-    }
+    if (!input.files[0]) return;
+    const label = input.closest('label');
+    const reader = new FileReader();
+    reader.onload = e => {
+        const existing = label.querySelector('img.slot-preview');
+        if (existing) existing.remove();
+        const svg = label.querySelector('svg');
+        if (svg) svg.style.display = 'none';
+        const img = document.createElement('img');
+        img.src = e.target.result;
+        img.className = 'slot-preview';
+        img.style.cssText = 'position:absolute;inset:0;width:100%;height:100%;object-fit:cover;border-radius:8px;pointer-events:none;';
+        label.appendChild(img);
+    };
+    reader.readAsDataURL(input.files[0]);
 }
 
 function deletePhoto(photoId, btn) {

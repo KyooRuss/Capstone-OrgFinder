@@ -13,23 +13,24 @@ class RecommendationApiController extends Controller
         'Technology'              => ['Technology', 'Information Technology', 'Programming', 'Software Development', 'Systems & Networking', 'Information Systems', 'Business & Technology Integration', 'Research', 'Innovation', 'Academic Organization'],
         'Programming'             => ['Programming', 'Software Development', 'Technology', 'Information Technology', 'Systems & Networking', 'Academic Organization'],
         'Networking'              => ['Systems & Networking', 'Information Technology', 'Technology', 'Information Systems'],
-        'Arts'                    => ['Arts & Design', 'Creative', 'Creative Services', 'Multimedia', 'Performing Arts', 'Photography', 'Photo & Video Editing', 'Media Production', 'Entertainment'],
+        'Arts'                    => ['Arts & Design', 'Creative', 'Creative Services', 'Multimedia', 'Performing Arts', 'Photography', 'Photo & Video Editing', 'Media Production', 'Entertainment', 'Dancing', 'Choreography', 'Sign Language', 'Non-Academic'],
         'Gaming'                  => ['Gaming', 'E-Sports', 'Competition', 'Team Strategy', 'Entertainment'],
         'Design'                  => ['Arts & Design', 'Creative', 'Creative Services', 'Multimedia', 'Photography', 'Photo & Video Editing'],
         'Animation'               => ['Multimedia', 'Creative Services', 'Arts & Design', 'Creative', 'Media Production', 'Recording & Production', 'Audio & Audiovisual Media'],
-        'Music'                   => ['Music Publishing', 'Singing / Vocal Performance', 'Music Collaboration', 'Recording & Production', 'Performing Arts', 'Audio & Audiovisual Media', 'Entertainment', 'Creative Services', 'Media Production'],
+        'Music'                   => ['Music Publishing', 'Singing', 'Music Collaboration', 'Recording & Production', 'Performing Arts', 'Audio & Audiovisual Media', 'Entertainment', 'Creative Services', 'Media Production'],
+        'Dancing'                 => ['Dancing', 'Choreography', 'Performing Arts', 'Entertainment', 'Creative', 'Arts & Design'],
         'Cyber Security'          => ['Information Technology', 'Systems & Networking', 'Technology', 'Information Systems'],
         'Artificial Intelligence' => ['Technology', 'Research', 'Information Technology', 'Academic Organization', 'Innovation'],
         'Analytics'               => ['Research', 'Academic Organization', 'Technology', 'Information Technology'],
         'Machine Learning'        => ['Technology', 'Research', 'Academic Organization', 'Innovation'],
         'Innovation'              => ['Innovation', 'Research', 'Technology', 'Business & Technology Integration', 'Academic Organization'],
-        'Leadership'              => ['Leadership', 'Communication', 'Service', 'Community', 'Discipline', 'Academic Organization', 'Educational'],
+        'Leadership'              => ['Leadership', 'Communication', 'Service', 'Community', 'Discipline', 'Academic Organization', 'Educational', 'Sign Language', 'Mental First Aid', 'Non-Academic'],
         'Sports'                  => ['Competition', 'Team Strategy', 'E-Sports', 'Gaming', 'Service', 'Discipline'],
     ];
 
     private const SKILL_MAP = [
-        'Public Speaking'    => ['Leadership', 'Communication', 'Educational', 'Academic Organization', 'Service', 'Community', 'Guidance & Counseling'],
-        'Leadership'         => ['Leadership', 'Service', 'Community', 'Discipline', 'Academic Organization', 'Educational'],
+        'Public Speaking'    => ['Leadership', 'Communication', 'Educational', 'Academic Organization', 'Service', 'Community', 'Guidance & Counseling', 'Sign Language', 'Mental First Aid'],
+        'Leadership'         => ['Leadership', 'Service', 'Community', 'Discipline', 'Academic Organization', 'Educational', 'Mental First Aid'],
         'Project Management' => ['Leadership', 'Service', 'Business & Technology Integration', 'Academic Organization', 'Community'],
         'Arts'               => ['Arts & Design', 'Creative', 'Creative Services', 'Multimedia', 'Performing Arts', 'Photography', 'Photo & Video Editing'],
         'Programming'        => ['Programming', 'Software Development', 'Technology', 'Information Technology', 'Systems & Networking'],
@@ -39,9 +40,9 @@ class RecommendationApiController extends Controller
     ];
 
     private const ACTIVITY_MAP = [
-        'Training'    => ['Educational', 'Leadership', 'Service', 'Community', 'Academic Organization', 'Discipline', 'Guidance & Counseling'],
-        'Forum'       => ['Communication', 'Leadership', 'Educational', 'Community', 'Academic Organization', 'Mental Health'],
-        'Seminar'     => ['Educational', 'Academic Organization', 'Leadership', 'Community', 'Mental Health', 'Guidance & Counseling'],
+        'Training'    => ['Educational', 'Leadership', 'Service', 'Community', 'Academic Organization', 'Discipline', 'Guidance & Counseling', 'Mental First Aid', 'Sign Language'],
+        'Forum'       => ['Communication', 'Leadership', 'Educational', 'Community', 'Academic Organization', 'Mental Health', 'Mental First Aid'],
+        'Seminar'     => ['Educational', 'Academic Organization', 'Leadership', 'Community', 'Mental Health', 'Guidance & Counseling', 'Mental First Aid'],
         'Competition' => ['Competition', 'E-Sports', 'Gaming', 'Team Strategy', 'Academic Organization'],
         'E-sports'    => ['E-Sports', 'Gaming', 'Competition', 'Team Strategy', 'Entertainment'],
         'Workshop'    => ['Educational', 'Creative', 'Arts & Design', 'Technology', 'Creative Services', 'Multimedia', 'Recording & Production', 'Photography', 'Media Production'],

@@ -24,8 +24,9 @@ class TrashController extends Controller
         }
 
         $query = User::onlyTrashed()
-            ->whereHas('organizationAccess', fn($q) => $q->where('organization_id', $org->id))
-            ->where('role', 'student');
+            ->whereHas('organizationAccess', fn($q) => $q
+                ->where('organization_id', $org->id)
+                ->where('position', 'Member'));
 
         if ($request->filled('search')) {
             $query->where(function ($q) use ($request) {
@@ -41,34 +42,6 @@ class TrashController extends Controller
         $members = $query->orderBy('last_name')->get();
 
         return view('admin-officer.trash.members', compact('members', 'org'));
-    }
-
-    public function officers(Request $request)
-    {
-        $org = $this->myOrganization();
-
-        if (!$org) {
-            return view('admin-officer.trash.officers', ['officers' => collect(), 'org' => null]);
-        }
-
-        $query = User::onlyTrashed()
-            ->whereHas('organizationAccess', fn($q) => $q->where('organization_id', $org->id))
-            ->where('role', 'admin_officer');
-
-        if ($request->filled('search')) {
-            $query->where(function ($q) use ($request) {
-                $q->where('name', 'like', '%' . $request->search . '%')
-                  ->orWhere('email', 'like', '%' . $request->search . '%');
-            });
-        }
-
-        if ($request->filled('status') && in_array($request->status, ['active', 'blocked'])) {
-            $query->where('status', $request->status);
-        }
-
-        $officers = $query->orderBy('last_name')->get();
-
-        return view('admin-officer.trash.officers', compact('officers', 'org'));
     }
 
     public function restoreUser($id)
