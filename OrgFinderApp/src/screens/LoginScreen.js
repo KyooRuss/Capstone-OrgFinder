@@ -53,7 +53,7 @@ export default function LoginScreen() {
                     <Text style={[styles.loginTitle, { fontSize: titleSize }]}>Login</Text>
 
                     <View style={[styles.inputWrap, { height: inputHeight }]}>
-                        <Text style={styles.inputIcon}>👤</Text>
+                        <Text style={styles.inputIcon}>@</Text>
                         <TextInput
                             style={styles.input}
                             placeholder="Institutional Email"
@@ -66,7 +66,7 @@ export default function LoginScreen() {
                     </View>
 
                     <View style={[styles.inputWrap, { height: inputHeight }]}>
-                        <Text style={styles.inputIcon}>🔒</Text>
+                        <Text style={styles.inputIcon}>•••</Text>
                         <TextInput
                             style={styles.input}
                             placeholder="Password"
@@ -138,7 +138,7 @@ const styles = StyleSheet.create({
         paddingHorizontal: 14,
         marginBottom: 14,
     },
-    inputIcon: { fontSize: 16, marginRight: 10 },
+    inputIcon: { fontSize: 14, marginRight: 10, color: '#888', fontWeight: '600' },
     input: { flex: 1, fontSize: 15, color: '#333' },
     forgotWrap: { alignItems: 'flex-end', marginBottom: 24 },
     forgotText: { fontSize: 13, color: '#4A6CF7' },

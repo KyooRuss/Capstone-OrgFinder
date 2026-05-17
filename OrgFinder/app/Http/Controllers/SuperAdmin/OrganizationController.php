@@ -243,7 +243,11 @@ class OrganizationController extends Controller
         $access->delete();
 
         $user = User::find($access->user_id);
-        if ($user && $user->organizationAccess()->count() === 0) {
+        $hasOfficerAccess = $user?->organizationAccess()
+            ->whereIn('position', ['Organization Adviser', 'Organization President'])
+            ->exists();
+
+        if ($user && !$hasOfficerAccess) {
             $user->update(['role' => 'student']);
         }
 

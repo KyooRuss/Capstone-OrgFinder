@@ -101,7 +101,7 @@ export default function ProfileScreen({ navigation }) {
                     <View style={styles.uploadBadge}>
                         {uploading
                             ? <ActivityIndicator size="small" color="#4A6CF7" />
-                            : <Text style={styles.uploadIcon}>📷</Text>
+                            : <Text style={styles.uploadIcon}>⊕</Text>
                         }
                     </View>
                 </TouchableOpacity>
@@ -202,7 +202,7 @@ const styles = StyleSheet.create({
         shadowRadius: 3,
         elevation: 3,
     },
-    uploadIcon: { fontSize: 14 },
+    uploadIcon: { fontSize: 16, color: '#4A6CF7', fontWeight: '600' },
     userName: { fontSize: 20, fontWeight: '700', color: '#fff', marginBottom: 10 },
     userEmail: { fontSize: 13, color: 'rgba(255,255,255,0.75)', marginBottom: 20 },
     statsRow: { flexDirection: 'row', gap: 24 },
