@@ -1,0 +1,12 @@
+{
+  "expo": {
+    "extra": {
+      "eas": {
+        "projectId": "d033c7e4-d0fd-470f-a2ad-d5f79c80c2b6"
+      }
+    },
+    "android": {
+      "package": "com.neu_silagan_russellbrian.orgfinder"
+    }
+  }
+}
