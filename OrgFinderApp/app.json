@@ -18,10 +18,16 @@
       "adaptiveIcon": {
         "foregroundImage": "./assets/adaptive-icon.png",
         "backgroundColor": "#4A6CF7"
-      }
+      },
+      "package": "com.neu_silagan_russellbrian.OrgFinderApp"
     },
     "web": {
       "favicon": "./assets/favicon.png"
+    },
+    "extra": {
+      "eas": {
+        "projectId": "f9f4880f-8b9b-4f73-b46d-f2bd89d9ab5f"
+      }
     }
   }
 }

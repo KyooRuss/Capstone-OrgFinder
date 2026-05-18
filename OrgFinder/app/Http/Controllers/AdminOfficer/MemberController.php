@@ -81,6 +81,15 @@ class MemberController extends Controller
         return response()->json(['success' => true, 'message' => 'User is now an admin officer.']);
     }
 
+    public function removeOfficer(User $user)
+    {
+        $this->authorizeMember($user);
+
+        $user->update(['role' => 'student']);
+
+        return response()->json(['success' => true, 'message' => 'User has been demoted to student.']);
+    }
+
     public function block(User $user)
     {
         $this->authorizeMember($user);
@@ -103,7 +112,19 @@ class MemberController extends Controller
     {
         $this->authorizeMember($user);
 
-        $user->delete();
+        $org = $this->myOrganization();
+
+        OrganizationAccess::where('organization_id', $org->id)
+            ->where('user_id', $user->id)
+            ->delete();
+
+        $hasOfficerAccess = $user->organizationAccess()
+            ->whereIn('position', ['Organization Adviser', 'Organization President'])
+            ->exists();
+
+        if (!$hasOfficerAccess) {
+            $user->update(['role' => 'student']);
+        }
 
         return response()->json(['success' => true, 'message' => 'Member removed.']);
     }

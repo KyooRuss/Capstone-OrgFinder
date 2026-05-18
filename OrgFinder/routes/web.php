@@ -123,6 +123,8 @@ Route::prefix('admin-officer')->name('admin-officer.')->group(function () {
             Route::post('/', [MemberController::class, 'store'])->name('store');
             Route::post('/{user}/block', [MemberController::class, 'block'])->name('block');
             Route::post('/{user}/unblock', [MemberController::class, 'unblock'])->name('unblock');
+            Route::post('/{user}/make-officer', [MemberController::class, 'makeOfficer'])->name('make-officer');
+            Route::post('/{user}/remove-officer', [MemberController::class, 'removeOfficer'])->name('remove-officer');
             Route::delete('/{user}', [MemberController::class, 'destroy'])->name('destroy');
         });
 
